@@ -239,3 +239,47 @@ stack("()[]{}")
  - Systematically breaking down the problem (brute force → pattern discovery → optimized solution)
    helps understand both correctness and efficiency
 */
+
+// MARK: - Phase 7: Re-Code (After Break)
+
+/*
+ Goal:
+     Re-implement the optimized solution after a long break
+     without referencing previous phases.
+
+ Rules:
+     - No peeking at Phase 4
+     - Logic must be reconstructed mentally
+     - If stuck, write reasoning before code
+
+ Validation:
+     - Code matches expected output
+     - Invariant can be verbally explained
+     - Time & space complexity are justified
+*/
+
+
+func optimized(_ str: String) -> Bool {
+    var str: [Character] = Array(str)
+    var stack: [Character] = []
+    var opening: Set<Character> = ["(", "{", "["]
+    var matching: [Character: Character] = [")": "(", "}":"{","]":"["]
+    
+    
+    for char in str {
+        if opening.contains(char) {
+            stack.append(char)
+        } else if let expectedOpen = matching[char] {
+            guard let last = stack.last, last == expectedOpen else {
+                return false
+            }
+            
+            stack.removeLast()
+        }
+    }
+    
+    return stack.isEmpty
+}
+
+
+optimized("()[]{}")
