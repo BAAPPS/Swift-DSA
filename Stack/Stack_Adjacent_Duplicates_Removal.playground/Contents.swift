@@ -312,6 +312,8 @@ return String(stack)
 optimized("abbaca")
 
 /*
+ Phase 7 Validation Trace
+
  Input: "abbaca"
  Converted to array:
  ["a", "b", "b", "a", "c", "a"]
