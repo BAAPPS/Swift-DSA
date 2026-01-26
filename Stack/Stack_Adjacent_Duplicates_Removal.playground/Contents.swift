@@ -9,7 +9,7 @@
 
  Example:
      Input: "abbaca"
-     Output: "ca"
+     Output: "abaca"
 
  Explanation:
      When two adjacent characters are the same, both are removed, which may expose new duplicates.
@@ -292,8 +292,113 @@ stack("abbbaaca")
  - Time and space complexity are justified
 */
 
-
 func optimized(_ str: String) -> String {
+    var chars = Array(str)
+    var stack: [Character] = []
     
-return ""
+    for char in chars {
+        
+        if let last = stack.last, last == char {
+            continue
+        }
+    
+        stack.append(char)
+        
+    }
+    
+return String(stack)
 }
+
+optimized("abbaca")
+
+/*
+ Input: "abbaca"
+ Converted to array:
+ ["a", "b", "b", "a", "c", "a"]
+
+ Invariant:
+ - Stack never contains consecutive duplicate characters
+ - Stack represents the processed prefix of the string
+ 
+ Key Insight:
+ - At each step, we only need to compare the current character
+     with the most recent kept character (stack top),
+     which guarantees O(n) time with single pass.
+
+ --------------------------------------------------
+
+ Step 1:
+ Stack before: []
+ Current char: "a"
+
+ Action:
+ - Stack is empty → push
+
+ Stack after:
+ ["a"]
+
+ --------------------------------------------------
+
+ Step 2:
+ Stack before: ["a"]
+ Current char: "b"
+
+ Action:
+ - Top ("a") != current ("b") → push
+
+ Stack after:
+ ["a", "b"]
+
+ --------------------------------------------------
+
+ Step 3:
+ Stack before: ["a", "b"]
+ Current char: "b"
+
+ Action:
+ - Top ("b") == current ("b") → skip
+
+ Stack after:
+ ["a", "b"]
+
+ --------------------------------------------------
+
+ Step 4:
+ Stack before: ["a", "b"]
+ Current char: "a"
+
+ Action:
+ - Top ("b") != current ("a") → push
+
+ Stack after:
+ ["a", "b", "a"]
+
+ --------------------------------------------------
+
+ Step 5:
+ Stack before: ["a", "b", "a"]
+ Current char: "c"
+
+ Action:
+ - Top ("a") != current ("c") → push
+
+ Stack after:
+ ["a", "b", "a", "c"]
+
+ --------------------------------------------------
+
+ Step 6:
+ Stack before: ["a", "b", "a", "c"]
+ Current char: "a"
+
+ Action:
+ - Top ("c") != current ("a") → push
+
+ Stack after:
+ ["a", "b", "a", "c", "a"]
+
+ --------------------------------------------------
+
+ Final Result:
+ Convert stack to string → "abaca"
+*/
