@@ -233,21 +233,116 @@ stack(s:"ab#c", t:"ad#c")
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
+ 
+ Input: s = "ab#c", t = "ad#c"
+ Output: true
+ 
+ Invariant:
+    - The stack always represents the processed string so far.
+ 
+ Key Insight:
+    - At each step, we check for backspace and once found, we pop top of the stack
+
+ --------------------------------------------------
  */
 
-func optimized(_ str: String) -> String {
-    return ""
+func optimized(s: String, t: String) -> Bool {
+    
+    func process(_ str:String) -> String {
+        var stack:[Character] = []
+        
+        for char in str {
+            if char == "#" {
+                if !stack.isEmpty {
+                    stack.popLast()
+                }
+            } else {
+                stack.append(char)
+            }
+        }
+        
+        return String(stack)
+    }
+    
+    
+    return process(s) == process(t)
+    
 }
 
-optimized("abbaca")
+optimized(s: "ab#c", t: "ad#d#c")
 
 /*
  Phase 7 Validation Trace
  
- Invariant:
+ Input: s = "ab#c", t = "ad#d#c"
  
+ Processing s: "ab#c"
+ Step 1:
+     stack = []
+     current = a
+     char is not # -> append to stack -> ["a"]
+     current stack -> ["a"]
+ Step 2:
+     stack = ["a"]
+     current = b
+     char is not # -> append to stack -> ["a", "b"]
+     current stack -> ["a", "b"]
+ Step 3:
+     stack = ["a", "b"]
+     current = #
+     char is # and stack not empty -> pop from stack -> ["a"]
+     current stack -> ["a"]
+ 
+ Step 4:
+     stack = ["a"]
+     current = c
+     char is not # -> append  to stack -> ["a", "c"]
+     current stack -> ["a", "c"]
+ 
+ Final traversal done -> convert stack to string -> "ac"
+ 
+ Processing s: "ad#d#c"
+ Step 1:
+     stack = []
+     current = a
+     char is not # -> append to stack -> ["a"]
+     current stack -> ["a"]
+ Step 2:
+     stack = ["a"]
+     current = d
+     char is not # -> append to stack -> ["a", "d"]
+     current stack -> ["a", "d"]
+ Step 3:
+     stack = ["a", "d"]
+     current = #
+     char is # and stack not empty -> pop from stack -> ["a"]
+     current stack -> ["a"]
+ 
+ Step 4:
+     stack = ["a"]
+     current = d
+     char is not # -> append  to stack -> ["a", "d"]
+     current stack -> ["a", "d"]
+ 
+ Step 5:
+     stack = ["a", "d"]
+     current = #
+     char is # and stack not empty -> pop from stack -> ["a"]
+     current stack -> ["a"]
+ 
+ Step 6:
+     stack = ["a"]
+     current = c
+     char is not # -> append  to stack -> ["a", "c"]
+     current stack -> ["a", "c"]
+ 
+ Final traversal done -> convert stack to string -> "ac"
+ 
+ 
+ Finished processing s and t -> checking s == t -> "ac" == "ac" -> true
+ 
+ Invariant: The stack always represents the processed string so far.
  
  --------------------------------------------------
- 
  
  */
