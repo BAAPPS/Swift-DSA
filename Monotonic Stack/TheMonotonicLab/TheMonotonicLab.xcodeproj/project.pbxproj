@@ -10,6 +10,7 @@
 		3C40E7802F5F69FF009C5F21 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */; };
 		3C40E7822F5F6A6A009C5F21 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 3C40E7812F5F6A63009C5F21 /* .gitignore */; };
 		3C40E7862F5F6AF0009C5F21 /* Secrets.template.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3C40E7852F5F6AF0009C5F21 /* Secrets.template.xcconfig */; };
+		3C40E7EE2F5F7A1F009C5F21 /* GloriaHallelujah-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3C40E7ED2F5F7A1F009C5F21 /* GloriaHallelujah-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,11 +18,25 @@
 		3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		3C40E7812F5F6A63009C5F21 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3C40E7852F5F6AF0009C5F21 /* Secrets.template.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.template.xcconfig; sourceTree = "<group>"; };
+		3C40E7ED2F5F7A1F009C5F21 /* GloriaHallelujah-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GloriaHallelujah-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3C40E7F02F5F7A74009C5F21 /* Exceptions for "TheMonotonicLab" folder in "TheMonotonicLab" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3C40E7702F5F6963009C5F21 /* TheMonotonicLab */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3C40E7732F5F6963009C5F21 /* TheMonotonicLab */ = {
+		3C40E7A02F5F7401009C5F21 /* TheMonotonicLab */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3C40E7F02F5F7A74009C5F21 /* Exceptions for "TheMonotonicLab" folder in "TheMonotonicLab" target */,
+			);
 			path = TheMonotonicLab;
 			sourceTree = "<group>";
 		};
@@ -44,8 +59,9 @@
 				3C40E7812F5F6A63009C5F21 /* .gitignore */,
 				3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */,
 				3C40E7852F5F6AF0009C5F21 /* Secrets.template.xcconfig */,
-				3C40E7732F5F6963009C5F21 /* TheMonotonicLab */,
+				3C40E7A02F5F7401009C5F21 /* TheMonotonicLab */,
 				3C40E7722F5F6963009C5F21 /* Products */,
+				3C40E7ED2F5F7A1F009C5F21 /* GloriaHallelujah-Regular.ttf */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,7 +89,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3C40E7732F5F6963009C5F21 /* TheMonotonicLab */,
+				3C40E7A02F5F7401009C5F21 /* TheMonotonicLab */,
 			);
 			name = TheMonotonicLab;
 			packageProductDependencies = (
@@ -121,6 +137,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C40E7EE2F5F7A1F009C5F21 /* GloriaHallelujah-Regular.ttf in Resources */,
 				3C40E7862F5F6AF0009C5F21 /* Secrets.template.xcconfig in Resources */,
 				3C40E7802F5F69FF009C5F21 /* Secrets.xcconfig in Resources */,
 				3C40E7822F5F6A6A009C5F21 /* .gitignore in Resources */,
@@ -142,6 +159,7 @@
 /* Begin XCBuildConfiguration section */
 		3C40E77A2F5F6964009C5F21 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -206,6 +224,7 @@
 		};
 		3C40E77B2F5F6964009C5F21 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -263,6 +282,7 @@
 		};
 		3C40E77D2F5F6964009C5F21 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -271,6 +291,7 @@
 				DEVELOPMENT_TEAM = 9U5442LL36;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TheMonotonicLab/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -295,6 +316,7 @@
 		};
 		3C40E77E2F5F6964009C5F21 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3C40E77F2F5F69FF009C5F21 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -303,6 +325,7 @@
 				DEVELOPMENT_TEAM = 9U5442LL36;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TheMonotonicLab/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
