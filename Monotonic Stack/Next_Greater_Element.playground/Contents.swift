@@ -249,22 +249,104 @@ monotonicDecreasingStack([1, 3, 2, 4])
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
- */
+ Input:  [1, 3, 2, 4]
+ Output: [3, 4, 4, -1]
+
+ Invariant:
+    - The stack stores indices whose next greater element has not yet been resolved.
+    - The values corresponding to those indices remain in decreasing order from bottom → top of the stack.
+
+ Key Insight:
+    - When a larger number appears, it becomes the next greater element for any smaller numbers waiting in the stack.
+    - Those indices are popped and their result is updated.
+    - The current index is then pushed to the stack to wait for its own next greater element.
+*/
 
 func optimized(_ input: [Int]) -> [Int] {
-    return []
+    
+    var stack: [Int] = []
+    var result = Array(repeating: -1, count: input.count)
+    
+    for (i, current) in input.enumerated() {
+        
+        while let lastIndex = stack.last,
+              input[lastIndex] < current {
+            
+            let resolvedIndex = stack.removeLast()
+            result[resolvedIndex] = current
+        }
+        
+        stack.append(i)
+    }
+    
+    return result
 }
 
 optimized([1, 3, 2, 4])
 
 /*
  Phase 7 Validation Trace
- 
- Invariant:
- 
- 
  --------------------------------------------------
- 
- 
- */
 
+ Input = [1, 3, 2, 4]
+
+ Step 1:
+    i = 0, current = 1
+    Stack = []
+    Result = [-1,-1,-1,-1]
+
+    No elements to resolve
+    Push index 0
+
+    Stack = [0]
+
+
+ Step 2:
+    i = 1, current = 3
+    Stack = [0]
+
+    input[0] = 1 < 3 → resolve
+
+    result[0] = 3
+    Pop index 0
+
+    Push index 1
+
+    Stack = [1]
+    Result = [3,-1,-1,-1]
+
+
+ Step 3:
+    i = 2, current = 2
+    Stack = [1]
+
+    input[1] = 3 > 2 → no resolution
+
+    Push index 2
+
+    Stack = [1,2]
+    Result = [3,-1,-1,-1]
+
+
+ Step 4:
+    i = 3, current = 4
+    Stack = [1,2]
+
+    input[2] = 2 < 4 → resolve
+    result[2] = 4
+    Pop index 2
+
+    input[1] = 3 < 4 → resolve
+    result[1] = 4
+    Pop index 1
+
+    Push index 3
+
+    Stack = [3]
+    Result = [3,4,4,-1]
+
+
+ End of traversal
+
+ Final Result: [3,4,4,-1]
+*/
