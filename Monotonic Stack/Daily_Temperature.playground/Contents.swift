@@ -293,14 +293,27 @@ monotonicDecreasingStack(&input)
 /*
 
  Invariant:
+    - The stack stores indices whose next greater temperature has not been resolved yet
  Key Insight:
+  - When a larger number appears, this will be used to check for the next greater element for any smaller number waiting in the stack
+ - If next greater element has been found, the smaller number indices in the stack will be popped and resolved
+ - The current element index will be pushed and rechecked for its own next greater element
 */
 
 func optimized(_ input: [Int]) -> [Int] {
+    var stack: [Int] = []
+    var result:[Int] = Array(repeating:0, count:input.count)
     
+    for (i, current) in input.enumerated() {
+        while let lastIndex = stack.last, input[lastIndex] < current {
+            let resolvedIndex = stack.removeLast()
+            result[resolvedIndex] = i - resolvedIndex
+        }
+        stack.append(i)
+    }
 
 
-    return []
+    return result
 }
 
 optimized([1, 3, 2, 4])
@@ -309,4 +322,114 @@ optimized([1, 3, 2, 4])
  Phase 7 Validation Trace
  --------------------------------------------------
 
+ Input: [1, 3, 2, 4]
+
+ Initial State:
+ stack  = []
+ result = [0,0,0,0]
+
+
+ Step 1
+ --------------------------------------------------
+ i = 0
+ current = 1
+
+ stack is empty → nothing to resolve
+
+ Push index 0
+
+ stack  = [0]
+ result = [0,0,0,0]
+
+
+ Step 2
+ --------------------------------------------------
+ i = 1
+ current = 3
+
+ lastIndex = 0
+ input[0] = 1
+
+ Check:
+ 1 < 3 → true
+
+ Resolve index 0
+
+ resolvedIndex = 0
+ result[0] = 1 - 0 = 1
+
+ stack becomes empty
+
+ Push index 1
+
+ stack  = [1]
+ result = [1,0,0,0]
+
+
+ Step 3
+ --------------------------------------------------
+ i = 2
+ current = 2
+
+ lastIndex = 1
+ input[1] = 3
+
+ Check:
+ 3 < 2 → false
+
+ No elements resolved
+
+ Push index 2
+
+ stack  = [1,2]
+ result = [1,0,0,0]
+
+
+ Step 4
+ --------------------------------------------------
+ i = 3
+ current = 4
+
+ lastIndex = 2
+ input[2] = 2
+
+ Check:
+ 2 < 4 → true
+
+ Resolve index 2
+
+ resolvedIndex = 2
+ result[2] = 3 - 2 = 1
+
+ stack = [1]
+
+
+ Check again
+
+ lastIndex = 1
+ input[1] = 3
+
+ 3 < 4 → true
+
+ Resolve index 1
+
+ resolvedIndex = 1
+ result[1] = 3 - 1 = 2
+
+ stack = []
+
+
+ Push index 3
+
+ stack  = [3]
+ result = [1,2,1,0]
+
+
+ End of Array
+ --------------------------------------------------
+
+ Remaining indices in stack have no greater element
+ to the right, so their result remains 0.
+
+ Final Result: [1,2,1,0]
 */
