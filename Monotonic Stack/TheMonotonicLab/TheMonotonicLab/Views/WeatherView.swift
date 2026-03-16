@@ -12,8 +12,6 @@ struct WeatherView: View {
     var body: some View {
         @Bindable var weatherVM = weatherVM
         VStack(spacing:20) {
-            
-            
             VStack(alignment:.leading, spacing:10){
                 Text("Enter City")
                     .gloriaHallelujah(size: 25)
@@ -51,7 +49,9 @@ struct WeatherView: View {
             
             Divider()
             
-            if !weatherVM.allTemperatures.isEmpty && weatherVM.currentTemperature != "" {
+            if weatherVM.isLoading {
+                ProgressView("Loading")
+            } else if !weatherVM.allTemperatures.isEmpty && weatherVM.currentTemperature != "" {
                 VStack(spacing:20) {
                     if weatherVM.weather != nil {
                         VStack(spacing: 10) {
@@ -69,11 +69,13 @@ struct WeatherView: View {
                             
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing:10){
-                                    ForEach(Array(weatherVM.allTemperatures.enumerated()), id: \.offset){ _,temp in
+                                    ForEach(Array(weatherVM.allTemperatures.enumerated()), id: \.offset){ index,temp in
                                         VStack {
                                             Text("\(Int(temp))°")
                                                 .font(.title2)
                                                 .bold()
+                                            Text("Days \(index+1)")
+                                                .font(.caption)
                                         }
                                         .padding()
                                         .foregroundColor(.pickledBluewood950)

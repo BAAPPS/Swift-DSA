@@ -13,35 +13,60 @@ struct ContentView: View {
     @State private var splashOpacity: Double = 0.0
     
     @State private var weatherVM = WeatherViewModel()
+    @State private var showGreaterTempSheet = false
     
     var body: some View {
-        ZStack(alignment: .center) {
-            Color.pickledBluewood200
-                .ignoresSafeArea()
-            
-            if !showSplash {
-               WeatherView()
-                    .environment(weatherVM)
-            }
-            
-            if showSplash {
-                SplashScreenView()
-                    .scaleEffect(splashScale)
-                    .opacity(splashOpacity)
-                    .frame(maxWidth:.infinity, maxHeight: .infinity)
-                    .onAppear {
-                        
-                        withAnimation(.easeInOut(duration:1.0)) {
-                            splashScale = 1.0
-                            splashOpacity = 1.0
-                        }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation(.easeInOut(duration: 1.0)) {
-                                showSplash = false
+        NavigationStack {
+            ZStack(alignment: .center) {
+                Color.pickledBluewood200
+                    .ignoresSafeArea()
+                
+                if !showSplash {
+                    WeatherView()
+                        .environment(weatherVM)
+                }
+                
+                if showSplash {
+                    SplashScreenView()
+                        .scaleEffect(splashScale)
+                        .opacity(splashOpacity)
+                        .frame(maxWidth:.infinity, maxHeight: .infinity)
+                        .onAppear {
+                            
+                            withAnimation(.easeInOut(duration:1.0)) {
+                                splashScale = 1.0
+                                splashOpacity = 1.0
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation(.easeInOut(duration: 1.0)) {
+                                    showSplash = false
+                                }
                             }
                         }
+                }
+            }
+            .navigationTitle("Weather")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    RefreshButtonView()
+                        .environment(weatherVM)
+                    
+                    Button {
+                        weatherVM.computeNextGreaterDays()
+                        showGreaterTempSheet = true
+                    } label: {
+                        Image(systemName: "chart.bar.doc.horizontal")
                     }
+                }
+                .sharedBackgroundVisibility(.hidden)
+            }
+            
+            .sheet(isPresented: $showGreaterTempSheet) {
+                NextWeatherInfoView(showGreaterTempSheet:$showGreaterTempSheet)
+                    .environment(weatherVM)
+                    .presentationDetents([.medium, .large])
             }
         }
     }
