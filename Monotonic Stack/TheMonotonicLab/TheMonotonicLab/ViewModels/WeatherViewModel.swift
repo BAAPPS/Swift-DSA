@@ -53,6 +53,6 @@ final class WeatherViewModel {
     // MARK: - Compute Greater Temperature Days
     func computeNextGreaterDays() {
         let tempInts = allTemperatures.map {Int($0)}
-        nextGreaterDays = GreaterTemperatureDay.findGreaterTemperatureDay(tempInts)
+        nextGreaterDays = TemperatureDay.findGreaterTemperatureDay(tempInts)
     }
 }

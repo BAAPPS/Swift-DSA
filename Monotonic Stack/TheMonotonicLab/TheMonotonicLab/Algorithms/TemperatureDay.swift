@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GreaterTemperatureDay {
+struct TemperatureDay {
     static func findGreaterTemperatureDay(_ input: [Int]) -> [Int] {
         var stack = Stack<Int>()
         var result:[Int] = Array(repeating:0, count: input.count)
