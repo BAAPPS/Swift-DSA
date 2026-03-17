@@ -28,18 +28,24 @@ struct NextWeatherScrollView: View {
                                 Text("-")
                                     .gloriaHallelujah(size:19)
                                     .foregroundColor(Color.pickledBluewood900)
+                            } else if result.previousValue != -1 {
+                                // Show previous → next
+                                Text("\(result.previousValue) → \(result.nextValue)°")
+                                    .gloriaHallelujah(size: 19)
+                                    .foregroundColor(Color.pickledBluewood900)
                             } else {
+                                // Only next value is available
                                 Text("\(result.nextValue)°")
-                                    .gloriaHallelujah(size:19)
+                                    .gloriaHallelujah(size: 19)
                                     .foregroundColor(Color.pickledBluewood900)
                             }
                             
                             Text("Day \(index + 1)")
                                 .font(.caption)
-                                
+                            
                         }
                         .padding()
-                        .background(Color.pickledBluewood800.opacity(0.3))
+                        .background(result.days == -1 ? Color.gray.opacity(0.2) : Color.pickledBluewood800.opacity(0.3))
                         .cornerRadius(10)
                         
                     }

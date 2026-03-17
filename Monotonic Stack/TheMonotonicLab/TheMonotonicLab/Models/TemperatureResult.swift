@@ -10,5 +10,6 @@ import Foundation
 
 struct TemperatureResult {
     let days: Int
+    let previousValue: Int
     let nextValue: Int
 }

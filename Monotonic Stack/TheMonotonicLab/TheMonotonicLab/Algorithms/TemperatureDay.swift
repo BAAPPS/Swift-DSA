@@ -12,7 +12,7 @@ struct TemperatureDay {
     static func findGreaterTemperatureDay(_ input: [Int]) -> [TemperatureResult] {
         var stack = Stack<Int>()
         var result = Array(
-            repeating: TemperatureResult(days: -1, nextValue: -1),
+            repeating: TemperatureResult(days: -1,  previousValue: -1, nextValue: -1),
             count: input.count
         )
         
@@ -21,6 +21,7 @@ struct TemperatureDay {
                 if let resolvedIndex = stack.pop() {
                     result[resolvedIndex] = TemperatureResult(
                         days: i - resolvedIndex,
+                        previousValue: input[lastIndex],
                         nextValue: current
                     )
                 }
@@ -34,7 +35,7 @@ struct TemperatureDay {
     static func findSmallerTemperatureDay(_ input: [Int]) -> [TemperatureResult] {
         var stack = Stack<Int>()
         var result = Array(
-            repeating: TemperatureResult(days: -1, nextValue: -1),
+            repeating: TemperatureResult(days: -1, previousValue: -1, nextValue: -1),
             count: input.count
         )
 
@@ -43,6 +44,7 @@ struct TemperatureDay {
                 if let resolvedIndex = stack.pop() {
                     result[resolvedIndex] = TemperatureResult(
                         days: i - resolvedIndex,
+                        previousValue: input[lastIndex],
                         nextValue: current
                     )
                 }

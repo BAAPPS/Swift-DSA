@@ -80,26 +80,24 @@ final class WeatherViewModel {
 }
 
 // MARK: - Preview Data
-
-// MARK: - Preview Data
 extension WeatherViewModel {
     static var preview: WeatherViewModel {
         let vm = WeatherViewModel()
         
         vm.nextGreaterDays = [
-            TemperatureResult(days: 1, nextValue: 70),
-            TemperatureResult(days: 2, nextValue: 72),
-            TemperatureResult(days: -1, nextValue: -1),
-            TemperatureResult(days: 1, nextValue: 68),
-            TemperatureResult(days: 3, nextValue: 71)
+            TemperatureResult(days: 1, previousValue: 68, nextValue: 70),
+            TemperatureResult(days: 2, previousValue: 70, nextValue: 72),
+            TemperatureResult(days: -1, previousValue: -1, nextValue: -1),
+            TemperatureResult(days: 1, previousValue: 67, nextValue: 68),
+            TemperatureResult(days: 3, previousValue: 68, nextValue: 71)
         ]
         
         vm.nextSmallerDays = [
-            TemperatureResult(days: 2, nextValue: 65),
-            TemperatureResult(days: 5, nextValue: 60),
-            TemperatureResult(days: 1, nextValue: 64),
-            TemperatureResult(days: 2, nextValue: 63),
-            TemperatureResult(days: 1, nextValue: 62)
+            TemperatureResult(days: 2, previousValue: 67, nextValue: 65),
+            TemperatureResult(days: 5, previousValue: 65, nextValue: 60),
+            TemperatureResult(days: 1, previousValue: 64, nextValue: 64),
+            TemperatureResult(days: 2, previousValue: 65, nextValue: 63),
+            TemperatureResult(days: 1, previousValue: 63, nextValue: 62)
         ]
         
         return vm
