@@ -300,14 +300,28 @@ nextSmallerElement([3, 7, 1, 7, 8])
 /*
 
  Invariant:
+    - The stacks stores indices whose next smaller element has not been resolved yet
  Key Insight:
+ - When a smaller element appears, it will be checked with the top of the stack
+ - If a next smaller element has been found, the greater element indices in the stack will be popped and resolved
+ - The current element’s index is pushed onto the stack, waiting to be resolved by a future smaller element.
 */
 
 func optimized(_ input: [Int]) -> [Int] {
     
+    var stack:[Int] = []
+    var result:[Int] = Array(repeating:-1, count:input.count)
+    
+    for (i, current) in input.enumerated() {
+        while let lastIndex = stack.last, input[lastIndex] > current {
+            let resolvedIndex = stack.removeLast()
+            result[resolvedIndex] = current
+        }
+        stack.append(i)
+    }
 
 
-    return []
+    return result
 }
 
 optimized([1, 3, 2, 4])
@@ -316,4 +330,83 @@ optimized([1, 3, 2, 4])
  Phase 7 Validation Trace
  --------------------------------------------------
 
+ Input: [1, 3, 2, 4]
+
+ Initial:
+ stack = []
+ result = [-1, -1, -1, -1]
+
+ --------------------------------------------------
+
+ Step 1
+
+ i = 0
+ current = 1
+
+ stack = []
+ nothing to resolve
+
+ push index 0
+
+ stack = [0]
+
+ --------------------------------------------------
+
+ Step 2
+
+ i = 1
+ current = 3
+
+ lastIndex = 0 → input[0] = 1
+ 1 < 3 → no resolution
+
+ push index 1
+
+ stack = [0, 1]
+
+ --------------------------------------------------
+
+ Step 3
+
+ i = 2
+ current = 2
+
+ lastIndex = 1 → input[1] = 3
+ 3 > 2 → resolve
+
+ pop 1
+ result[1] = 2
+
+ stack = [0]
+
+ lastIndex = 0 → input[0] = 1
+ 1 < 2 → stop
+
+ push index 2
+
+ stack = [0, 2]
+
+ result = [-1, 2, -1, -1]
+
+ --------------------------------------------------
+
+ Step 4
+
+ i = 3
+ current = 4
+
+ lastIndex = 2 → input[2] = 2
+ 2 < 4 → no resolution
+
+ push index 3
+
+ stack = [0, 2, 3]
+
+ --------------------------------------------------
+
+ End of traversal
+
+ Remaining indices in stack have no smaller element
+
+ Final Result: [-1, 2, -1, -1]
 */
