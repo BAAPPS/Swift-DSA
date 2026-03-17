@@ -15,8 +15,10 @@ final class WeatherViewModel {
     var temperatureUnit: String = "°F"
     var city: String = "San Francisco"
     
-    // MARK: - New property for next greater day
-    var nextGreaterDays: [Int] = []
+    // MARK: - New property for next greater / smaller day
+    var nextGreaterDays: [TemperatureResult] = []
+    var nextSmallerDays: [TemperatureResult] = []
+    
     
     
     // MARK: - Computed
@@ -29,6 +31,11 @@ final class WeatherViewModel {
         return weather?.list.map {$0.main.temp} ?? []
     }
     
+    var tempInts: [Int] {
+        return allTemperatures.map { Int($0) }
+    }
+    
+
     // MARK: - API Call
     func loadWeather() async {
         isLoading = true
@@ -50,9 +57,51 @@ final class WeatherViewModel {
         print("🌤️ Finished fetch for city: \(city)")
     }
     
-    // MARK: - Compute Greater Temperature Days
+    // MARK: - Compute Greater / Smaller Temperature Days
+    
     func computeNextGreaterDays() {
-        let tempInts = allTemperatures.map {Int($0)}
         nextGreaterDays = TemperatureDay.findGreaterTemperatureDay(tempInts)
+    }
+    
+    func computeNextSmallerDays() {
+        nextSmallerDays = TemperatureDay.findSmallerTemperatureDay(tempInts)
+    }
+    
+    // MARK: - Day String Formatter
+    
+    func formatDays(_ days: Int) -> String {
+        if days == -1 {
+            return "N/A" // or "No data"
+        } else {
+            return "\(days) \(days == 1 ? "Day" : "Days")"
+        }
+    }
+    
+}
+
+// MARK: - Preview Data
+
+// MARK: - Preview Data
+extension WeatherViewModel {
+    static var preview: WeatherViewModel {
+        let vm = WeatherViewModel()
+        
+        vm.nextGreaterDays = [
+            TemperatureResult(days: 1, nextValue: 70),
+            TemperatureResult(days: 2, nextValue: 72),
+            TemperatureResult(days: -1, nextValue: -1),
+            TemperatureResult(days: 1, nextValue: 68),
+            TemperatureResult(days: 3, nextValue: 71)
+        ]
+        
+        vm.nextSmallerDays = [
+            TemperatureResult(days: 2, nextValue: 65),
+            TemperatureResult(days: 5, nextValue: 60),
+            TemperatureResult(days: 1, nextValue: 64),
+            TemperatureResult(days: 2, nextValue: 63),
+            TemperatureResult(days: 1, nextValue: 62)
+        ]
+        
+        return vm
     }
 }

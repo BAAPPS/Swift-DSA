@@ -55,6 +55,7 @@ struct ContentView: View {
                     
                     Button {
                         weatherVM.computeNextGreaterDays()
+                        weatherVM.computeNextSmallerDays()
                         showGreaterTempSheet = true
                     } label: {
                         Image(systemName: "chart.bar.doc.horizontal")
@@ -64,9 +65,27 @@ struct ContentView: View {
             }
             
             .sheet(isPresented: $showGreaterTempSheet) {
-                NextWeatherInfoView(showGreaterTempSheet:$showGreaterTempSheet)
-                    .environment(weatherVM)
-                    .presentationDetents([.medium, .large])
+                NavigationStack {
+                    NextWeatherInfoView()
+                        .environment(weatherVM)
+                        .navigationTitle("Temperature Info")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button {
+                                    showGreaterTempSheet = false
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(.pickledBluewood200)
+                                        .frame(width: 32, height: 32)
+                                        .background(Color.pickledBluewood950.opacity(0.8))
+                                        .clipShape(Circle())
+                                }
+                            }
+                        }
+                        .presentationDetents([.medium, .large])
+                }
             }
         }
     }
