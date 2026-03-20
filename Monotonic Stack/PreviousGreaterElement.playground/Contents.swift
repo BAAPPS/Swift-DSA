@@ -308,14 +308,38 @@ monotonicDecreasingStack([1, 6, 4, 10, 2])
 /*
 
  Invariant:
+    The stack stores indices of elements in decreasing order, representing candidates for the previous greater element.
+ 
  Key Insight:
+ 
+ - When a previous element is smaller than the current element, it will be popped from the stack
+ -  After all smaller elements are popped the top of the stack will hold the greater element ready to be used
+ 
+ - We update the arrays position of the current element with the top of the stack element
+ 
 */
 
 func optimized(_ input: [Int]) -> [Int] {
     
+    var stack: [Int] = []
+    
+    var result:[Int] = Array(repeating: -1, count: input.count)
+    
+    for i in 0..<input.count {
+        let current = input[i]
+        while let lastIndex = stack.last, input[lastIndex] <= current {
+            _ = stack.popLast()
+        }
+        
+        if let top = stack.last {
+            result[i] = input[top]
+        }
+        
+        stack.append(i)
+        
+    }
 
-
-    return []
+    return result
 }
 
 optimized([1, 3, 2, 4])
@@ -323,5 +347,85 @@ optimized([1, 3, 2, 4])
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ 
+ Input: [1, 3, 2, 4]
 
-*/
+ Initial:
+ stack = []
+ result = [-1, -1, -1, -1]
+ 
+ --------------------------------------------------
+ 
+ Step 1
+ 
+ i = 0
+ current = 1
+ 
+ No elements in stack → no previous greater
+ result[0] = -1
+ 
+ push index 0
+ 
+ stack = [0]
+ 
+ --------------------------------------------------
+ 
+ Step 2
+ 
+ i = 1
+ current = 3
+ 
+ lastIndex = 0 → input[0] = 1
+ 1 <= 3 → pop
+ 
+ stack is now empty → no previous greater
+ result[1] = -1
+ 
+ push index 1
+ 
+ stack = [1]
+ 
+ --------------------------------------------------
+ 
+ Step 3
+ 
+ i = 2
+ current = 2
+ 
+ lastIndex = 1 → input[1] = 3
+ 3 > 2 → stop popping
+ 
+ top = 1 → input[1] = 3
+ result[2] = 3
+ 
+ push index 2
+ 
+ stack = [1, 2]
+ 
+ --------------------------------------------------
+ 
+ Step 4
+ 
+ i = 3
+ current = 4
+ 
+ lastIndex = 2 → input[2] = 2
+ 2 <= 4 → pop
+ 
+ lastIndex = 1 → input[1] = 3
+ 3 <= 4 → pop
+ 
+ stack is now empty → no previous greater
+ result[3] = -1
+ 
+ push index 3
+ 
+ stack = [3]
+ 
+ --------------------------------------------------
+ 
+ End of traversal
+ 
+ Final Result: [-1, -1, 3, -1]
+ 
+ */
