@@ -18,7 +18,8 @@ final class WeatherViewModel {
     // MARK: - New property for next greater / smaller day
     var nextGreaterDays: [TemperatureResult] = []
     var nextSmallerDays: [TemperatureResult] = []
-    
+    var previousSmallerDays: [TemperatureResult] = []
+    var previousGreaterDays: [TemperatureResult] = []
     
     
     // MARK: - Computed
@@ -35,7 +36,7 @@ final class WeatherViewModel {
         return allTemperatures.map { Int($0) }
     }
     
-
+    
     // MARK: - API Call
     func loadWeather() async {
         isLoading = true
@@ -57,7 +58,7 @@ final class WeatherViewModel {
         print("🌤️ Finished fetch for city: \(city)")
     }
     
-    // MARK: - Compute Greater / Smaller Temperature Days
+    // MARK: - Compute Higher / Lower Temperature Days
     
     func computeNextGreaterDays() {
         nextGreaterDays = TemperatureDay.findGreaterTemperatureDay(tempInts)
@@ -67,17 +68,29 @@ final class WeatherViewModel {
         nextSmallerDays = TemperatureDay.findSmallerTemperatureDay(tempInts)
     }
     
+    func computePreviousSmallerDays() {
+        previousSmallerDays = TemperatureDay.findPreviousTemperatureDay(tempInts) { $0 >= $1 }
+    }
+    
+    func computePreviousGreaterDays() {
+        previousGreaterDays = TemperatureDay.findPreviousTemperatureDay(tempInts) { $0 <= $1 }
+    }
+    
     // MARK: - Day String Formatter
     
     func formatDays(_ days: Int) -> String {
-        if days == -1 {
-            return "N/A" // or "No data"
-        } else {
-            return "\(days) \(days == 1 ? "Day" : "Days")"
-        }
+        guard days != -1 else { return "No data" }
+        return "\(days) \(days == 1 ? "Day" : "Days")"
+        
     }
     
+    func formatDaysAgo(_ days: Int) -> String {
+        guard days != -1 else { return "No data" }
+        return "\(formatDays(days)) ago"
+    }
+
 }
+
 
 // MARK: - Preview Data
 extension WeatherViewModel {
@@ -98,6 +111,22 @@ extension WeatherViewModel {
             TemperatureResult(days: 1, previousValue: 64, nextValue: 64),
             TemperatureResult(days: 2, previousValue: 65, nextValue: 63),
             TemperatureResult(days: 1, previousValue: 63, nextValue: 62)
+        ]
+        
+        vm.previousGreaterDays = [
+            TemperatureResult(days: -1, previousValue: -1, nextValue: 68),
+            TemperatureResult(days: -1, previousValue: -1, nextValue: 70),
+            TemperatureResult(days: -1, previousValue: -1, nextValue: 72),
+            TemperatureResult(days: 1, previousValue: 72, nextValue: 67),
+            TemperatureResult(days: 2, previousValue: 72, nextValue: 68)
+        ]
+        
+        vm.previousSmallerDays = [
+            TemperatureResult(days: -1, previousValue: -1, nextValue: 68),
+            TemperatureResult(days: 1, previousValue: 68, nextValue: 70),
+            TemperatureResult(days: 2, previousValue: 68, nextValue: 72),
+            TemperatureResult(days: -1, previousValue: -1, nextValue: 67),
+            TemperatureResult(days: 1, previousValue: 67, nextValue: 68)
         ]
         
         return vm

@@ -13,7 +13,7 @@ struct NextWeatherInfoView: View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing:5) {
                 Spacer().frame(height:40)
-                Text("Days Until Greater Temperature")
+                Text("Days Until Higher Temperature")
                     .gloriaHallelujah(size: 23)
                     .padding(.top, 25)
                 
@@ -22,12 +22,25 @@ struct NextWeatherInfoView: View {
                 
                 VStack(spacing:5) {
                     
-                    Text("Days Untl Lower Temperature")
+                    Text("Days Until Lower Temperature")
                         .gloriaHallelujah(size:23)
                     
                     NextWeatherScrollView(days: weatherVM.nextSmallerDays)
                         .environment(weatherVM)
                 }
+                
+                VStack(spacing:5) {
+                    Text("Previous Lower Temperature Days")
+                        .gloriaHallelujah(size:23)
+                    PreviousWeatherScrollView(days: weatherVM.previousSmallerDays)
+                }
+                
+                VStack(spacing:5) {
+                    Text("Previous Higher Temperature Days")
+                        .gloriaHallelujah(size:23)
+                    PreviousWeatherScrollView(days: weatherVM.previousGreaterDays)
+                }
+                
             }
         }
     }

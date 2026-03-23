@@ -38,7 +38,7 @@ struct TemperatureDay {
             repeating: TemperatureResult(days: -1, previousValue: -1, nextValue: -1),
             count: input.count
         )
-
+        
         for (i, current) in input.enumerated() {
             while let lastIndex = stack.peek, input[lastIndex] > current {
                 if let resolvedIndex = stack.pop() {
@@ -51,7 +51,30 @@ struct TemperatureDay {
             }
             stack.push(i)
         }
-
+        
+        return result
+    }
+    
+    static func findPreviousTemperatureDay(_ input:[Int],  shouldPop: (Int, Int) -> Bool) -> [TemperatureResult] {
+        var stack = Stack<Int>()
+        var result = Array(
+            repeating: TemperatureResult(days: -1, previousValue: -1, nextValue: -1),
+            count: input.count
+        )
+        
+        for (i, current) in input.enumerated() {
+            
+            while let lastIndex = stack.peek, shouldPop(input[lastIndex], current) {
+                _ = stack.pop()
+            }
+            
+            if let lastIndex = stack.peek {
+                result[i].previousValue = input[lastIndex]
+                result[i].days = i - lastIndex
+            }
+            
+            stack.push(i)
+        }
         return result
     }
     

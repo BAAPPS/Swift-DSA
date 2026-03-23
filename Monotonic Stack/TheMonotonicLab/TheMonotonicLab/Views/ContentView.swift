@@ -56,6 +56,8 @@ struct ContentView: View {
                     Button {
                         weatherVM.computeNextGreaterDays()
                         weatherVM.computeNextSmallerDays()
+                        weatherVM.computePreviousGreaterDays()
+                        weatherVM.computePreviousSmallerDays()
                         showGreaterTempSheet = true
                     } label: {
                         Image(systemName: "chart.bar.doc.horizontal")
@@ -84,7 +86,7 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        .presentationDetents([.medium, .large])
+                        .presentationDetents([.large])
                 }
             }
         }

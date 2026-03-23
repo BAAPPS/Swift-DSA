@@ -9,7 +9,13 @@ import Foundation
 
 
 struct TemperatureResult {
-    let days: Int
-    let previousValue: Int
+    var days: Int
+    var previousValue: Int
     let nextValue: Int
+}
+
+extension TemperatureResult {
+    var currentValue: Int {
+        return nextValue
+    }
 }
