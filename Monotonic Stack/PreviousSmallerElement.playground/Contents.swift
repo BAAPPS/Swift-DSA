@@ -281,16 +281,34 @@ monotonicIncreasingStack([1, 3, 2, 4])
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
- 
  Invariant:
+   - The stack stores indices such that their values are in increasing order, representing candidates for the previous smaller element
  Key Insight:
+    - When a previous element is greater than  or equal the current element, it can be popped from the stack
+    - After all the greater elements are popped, the top of the stack will hold the previous smaller element index
+    - We use the index and extract the element from our given array and update our new arrays position
  */
 
 func optimized(_ input: [Int]) -> [Int] {
     
+    var stack:[Int] = []
+    var result: [Int] = Array(repeating: -1, count: input.count)
     
+    for i in 0..<input.count {
+        let current = input[i]
+        
+        while let lastIndex = stack.last, input[lastIndex] >= current {
+            _ = stack.popLast()
+        }
+        
+        if let topIndex = stack.last {
+            result[i] = input[topIndex]
+        }
+        
+        stack.append(i)
+    }
     
-    return []
+    return result
 }
 
 optimized([1, 3, 2, 4])
@@ -298,5 +316,53 @@ optimized([1, 3, 2, 4])
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ 
+ Step 1
+ 
+ i = 0
+ current = 1
+ 
+ No elements in the stack
+ result[0] = -1
+ stack = [0]
+ 
+ Step 2
+ 
+ i = 1
+ current = 3
+ 
+ lastIndex = 0, input[0] = 1 < 3
+ 
+ topIndex = 0 → result[1] = 1
+ 
+ stack = [0, 1]
+ 
+ 
+ Step 3
+ 
+ i = 2
+ current = 2
+ 
+ lastIndex = 1, input[1] = 3 >= 2  → pop
+ 
+ lastIndex = 0, input[0] = 1 < 2
+ 
+ topIndex = 0  → result[2] = 1
+ 
+ stack = [0, 2]
+ 
+ Step 4
+ 
+ i = 3
+ current = 4
+ 
+ lastIndex = 2, input[2] = 2 < 4
+ 
+ topIndex = 2  → result[3] = 2
+ 
+ stack = [0, 2, 3]
+ 
+ End of loop
+ result = [-1,1,1,2]
  
  */
