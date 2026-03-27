@@ -304,26 +304,158 @@ monotonicDecreasingStack([1, 3, 2, 4])
 
 /*
  
- Invariant:
- Key Insight:
- */
+Invariant:
+    - The stack stores indices of elements in decreasing order.
+    - After removing elements less than or equal to the current value,
+      the top of the stack represents the previous greater element (boundary).
+
+Key Insight:
+    - Elements less than or equal to the current element cannot act as boundaries, so they are removed from the stack.
+
+    - After popping, the top of the stack (if it exists) is the previous greater element, which serves as the left boundary.
+
+    - The span is calculated as the distance between the current index and this boundary.
+
+    - If no boundary exists, the span extends to the beginning of the array.
+ 
+*/
 
 func optimized(_ input: [Int]) -> [Int] {
+    var stack: [Int] = []
+    var result: [Int] = Array(repeating: 1, count: input.count)
     
+    for i in 0..<input.count {
+        while let lastIndex = stack.last, input[lastIndex] <= input[i] {
+            _ = stack.popLast()
+        }
+        
+        if let lastIndex = stack.last {
+            result[i] = i - lastIndex
+        } else {
+            result[i] = i + 1
+        }
+        
+        
+        stack.append(i)
+    }
     
-    
-    return []
+    return result
 }
 
 optimized([1, 3, 2, 4])
 
+
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
- 
- 
- 
- 
- */
 
+ Input: [1, 3, 2, 4]
 
+ Initial:
+ stack = []
+ result = [1, 1, 1, 1]
+
+ --------------------------------------------------
+
+ Step 1:
+
+ i = 0
+ current = 1
+
+ Stack before popping: []
+
+ → No elements to pop
+
+ → No boundary exists
+
+ span = i + 1 = 0 + 1 = 1
+
+ result[0] = 1
+
+ Push index 0
+
+ Stack after push: [0]
+
+ --------------------------------------------------
+
+ Step 2:
+
+ i = 1
+ current = 3
+
+ Stack before popping: [0]
+
+ → input[0] = 1 ≤ 3 → pop
+
+ Stack after popping: []
+
+ → No boundary exists
+
+ span = i + 1 = 1 + 1 = 2
+
+ result[1] = 2
+
+ Push index 1
+
+ Stack after push: [1]
+
+ --------------------------------------------------
+
+ Step 3:
+
+ i = 2
+ current = 2
+
+ Stack before popping: [1]
+
+ → input[1] = 3 > 2 → stop popping
+
+ → boundary = 1 (value = 3)
+
+ span = i - boundary = 2 - 1 = 1
+
+ result[2] = 1
+
+ Push index 2
+
+ Stack after push: [1, 2]
+
+ --------------------------------------------------
+
+ Step 4:
+
+ i = 3
+ current = 4
+
+ Stack before popping: [1, 2]
+
+ → input[2] = 2 ≤ 4 → pop
+ → input[1] = 3 ≤ 4 → pop
+
+ Stack after popping: []
+
+ → No boundary exists
+
+ span = i + 1 = 3 + 1 = 4
+
+ result[3] = 4
+
+ Push index 3
+
+ Stack after push: [3]
+
+ --------------------------------------------------
+
+ End of traversal
+
+ Final result = [1, 2, 1, 4]
+
+ --------------------------------------------------
+
+ Key Observations:
+
+ - Stack stores indices in decreasing order of values
+ - After popping, the top of the stack is the previous greater element (boundary)
+ - Span is computed as distance to that boundary
+
+*/
