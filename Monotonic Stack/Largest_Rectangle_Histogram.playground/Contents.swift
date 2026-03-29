@@ -357,7 +357,7 @@ func monotonicIncreasingStack(_ input: [Int]) -> Int {
     var stack:[Int] = []
     var maxArea: Int = 0
     
-    for i in 0..<input.count {
+    for i in 0...input.count {
         let currentHeight = (i == input.count) ? 0 : input[i]
         
         while let lastIndex = stack.last, input[lastIndex] >= currentHeight {
@@ -425,14 +425,53 @@ monotonicIncreasingStack([1, 3, 2, 4])
 /*
  
  Invariant:
+    - The stack store indices of bar  in strictly increasing height order
+    - The stack represents indices whose maximum height has not yet been fully determined
+ 
  Key Insight:
+ 
+    - When we encounter a bar shorter than the top of the stack, we have found the RIGHT boundary for the taller bar in the stack
+    
+    - While the current bar is smaller than or equal to the top of stack
+ 
+        - Pop the stack
+        - The popped index represents the height of the rectangle
+        - The current index is the RIGHT boundary
+        - The new top of thr stack (if any) is our LEFT boundary
+ 
+    - Using these boundaries
+ 
+        - width = rightBoundary - leftBoundary - 1
+        - area = height * width
+ 
+    - The sential value (height = 0) is used at the end to ensure all remaining bars are processed
+ 
+
+ 
  */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input: [Int]) -> Int {
     
+    var stack: [Int] = []
+    var maxArea: Int = 0
     
+    for i in 0...input.count {
+        let currentHeight = (i == input.count) ? 0 : input[i]
+        
+        while let lastIndex = stack.last, input[lastIndex] >= currentHeight {
+            let height = input[stack.removeLast()]
+            
+            let leftBoundary = stack.last ?? -1
+            let width = i - leftBoundary - 1
+            
+            let area = height * width
+            maxArea = max(maxArea, area)
+        }
+        
+        stack.append(i)
+    }
     
-    return []
+    return maxArea
 }
 
 optimized([1, 3, 2, 4])
@@ -441,4 +480,147 @@ optimized([1, 3, 2, 4])
  Phase 7 Validation Trace
  --------------------------------------------------
  
+ Initial:
+    Input: [1, 3, 2, 4]
+    stack = []
+    maxArea = 0
+ --------------------------------------------------
+ Step 1
+ 
+ i = 0
+ curentHeight = 1
+ 
+ stack empty → push index
+
+ stack = [0]
+ 
+ --------------------------------------------------
+ 
+ Step 2
+ 
+ i = 1
+ currentHeight = 3
+ 
+ lastIndex = 0, input[0] = 1 < 3 → no pop
+ 
+ push index
+
+ stack = [0, 1]
+ 
+ --------------------------------------------------
+ 
+ Step 3
+ 
+ i = 2
+ currentHeight = 2
+ 
+ input[1] = 3 >= 2 → pop
+ 
+    - height = 3
+ 
+    - leftBoundary = 0
+ 
+    - width = 2 - 0 - 1 = 1
+ 
+    - area = 3 * 1 = 3
+ 
+    - maxArea = (0, 3) = 3
+ 
+ stack = [0]
+ 
+ input[0] = 1 < 2 → stop popping
+
+ push index
+ 
+ stack = [0, 2]
+ 
+
+ --------------------------------------------------
+ 
+ Step 4
+ 
+ i = 3
+ currentHeight = 4
+ 
+ input[2] = 2 < 4 → no pop
+ 
+ push index
+ 
+ stack = [0, 2, 3]
+ 
+ --------------------------------------------------
+ 
+ Step 5 (Sential Flush)
+ 
+ i = 4
+ currentHeight = 0
+ 
+ 
+ input[3] = 4 >= 0 → pop
+ 
+    height = 4
+    leftBoundary = 2
+    rightBoundary = 4
+
+    width = 4 - 2 - 1 = 1
+    area = 4 * 1 = 4
+    maxArea = max(3, 4) = 4
+ 
+ stack = [0, 2]
+ 
+ input[2] = 2 >= 0 → pop
+ 
+    height = 2
+    leftBoundary = 0
+    rightBoundary = 4
+
+    width = 4 - 0 - 1 = 3
+    area = 2 * 3 = 6
+    maxArea = max(4, 6) = 6
+ 
+ stack = [0]
+ 
+ input[0] = 1 >= 0 → pop
+ 
+    height = 1
+ 
+    leftBoundary = -1
+    rightBoundary = 4
+ 
+    width = 4 - (-1) - 1 = 4
+    area = 1 * 4 = 4
+ 
+    maxArea = max(6,4) = 6
+ 
+ stack = []
+
+ push index
+
+ stack = [4]
+
+ --------------------------------------------------
+
+ End of traversal
+
+ Final maxArea = 6
+ --------------------------------------------------
+
+ Key Observations:
+
+ - Stack stores indices in increasing order of heights
+   (we pop greater or equal heights to maintain this)
+
+ - When we pop an element:
+     - The current index acts as the RIGHT boundary
+     - The new top of the stack is the LEFT boundary (previous smaller element)
+
+ - The width is determined using:
+     width = rightBoundary - leftBoundary - 1
+
+ - Sentinel value (height = 0) at i == input.count
+   forces all remaining bars in the stack to be resolved
+
+ - Monotonic stack has TWO modes:
+     1. Resolve-on-the-fly (next greater, daily temperatures, etc.)
+     2. Resolve-on-boundary (histogram → requires full boundary discovery + flush)
  */
