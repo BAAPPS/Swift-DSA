@@ -283,14 +283,54 @@ monotonicDecreasingStack([6,0,8,2,1,5])
 /*
  
  Invariant:
+    - The stack stores indices in decreasing order for candidates preservation
+ 
+    - The stack represents indices whose smaller-values might be a potential candidate for maximum width
+    
  Key Insight:
+ 
+    - The process of this problem requires two passes:
+ 
+    Pass 1:
+ 
+        - Essentially we will be building the structure of our stack in decreasing order. The reason for this is we want smaller-values as these are potential candidates to create a maximum width.
+ 
+        - Larger values will not help us satisfy the following constraints (nums[i] <= nums[j]). Thus, discarded these values is the best option as they are the worst candidates for i
+ 
+    Pass 2:
+ 
+        - Using what we have built in pass 1, we will traverse right-to-left and greedily determine if we have a valid ramp based on the following constraint (nums[j] >= nums[i])
+ 
+        - Once we have a valid ramp, we are going to process the top of the stack and update our maxWidth by finding the distance of j - i.
+ 
+        - The top of the stack is the most recent valid candidate, and due to the stack’s ordering, it is the best one to check first for maximizing width with the current j
+ 
+        - When a match is found, we pop and continue to checking earlier candidates to explore all possible pairs of ramp efficiently
  */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input: [Int]) -> Int {
+    
+    var stack:[Int] = []
+    
+    var maxWidth: Int = 0
+    
+    // Pass 1 (Candidates Preservation) left-to-right
+    for i in 0..<input.count {
+        if stack.isEmpty || input[i] < input[stack.last!] {
+            stack.append(i)
+        }
+    }
     
     
+    // Pass 2 (Matching & Optimization) right-to-left
+    for j in stride(from: input.count - 1, through: 0, by: -1) {
+        while let i = stack.last, input[j] >= input[i] {
+            maxWidth = max(maxWidth, j - i)
+            stack.removeLast()
+        }
+    }
     
-    return []
+    return maxWidth
 }
 
 optimized([6,0,8,2,1,5])
@@ -299,4 +339,65 @@ optimized([6,0,8,2,1,5])
  Phase 7 Validation Trace
  --------------------------------------------------
  
+ 
+ Initial:
+    Input: [6,0,8,2,1,5]
+    stack = []
+    maxWidth = 0
+ --------------------------------------------------
+ 
+ Phase 1
+ 
+ i = 0
+ 
+ stack is empty
+ 
+ stack = [0]
+ 
+ i = 1
+ 
+ input[1] (0) < input[0] (6)
+ 
+ stack = [0, 1]
+ 
+ i = 2
+ 
+ input[2] (8) > input[1] (0) → skip
+ 
+ i = 3
+ 
+ input[3] (2) > input[1] (0) → skip
+ 
+ i = 4
+ 
+ input[4] (1) > input[1] (0) → skip
+ 
+ i = 5
+ 
+ input[5] (5) > input[1] (0) → skip
+ 
+ Final stack = [0, 1] → values = [6, 0] → Strictly decreasing values
+ 
+ --------------------------------------------------
+ 
+ Pass 2
+
+ j = 5 (5)
+ Stack: [0,1]
+ → 5 >= 0 → width = 4 → pop → [0]
+ → 5 >= 6 ❌ stop
+
+ j = 4 (1)
+ Stack: [0]
+ → 1 >= 6 ❌
+
+ j = 3 (2)
+ Stack: [0]
+ → 2 >= 6 ❌
+
+ j = 2 (8)
+ Stack: [0]
+ → 8 >= 6 → width = 2 → pop → []
+
+ Stack is now empty → we can stop early
  */
