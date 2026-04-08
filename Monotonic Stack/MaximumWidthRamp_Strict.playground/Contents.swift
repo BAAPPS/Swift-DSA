@@ -405,16 +405,75 @@ monotonicDecreasingStack([5,4,3,2,8])
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
-
  Invariant:
+ 
+ - The stack stores indices in strictly decreasing values
+ - These indices represent non-dominated candidates for i
+ 
  Key Insight:
-*/
+ 
+ This problem requires two passes:
+ 
+ ------------------------------------------------------------
+ 
+ Pass 1 (Build Candidates):
+ 
+ - Traverse left → right
+ - Build a monotonic decreasing stack
+ - Only push index i if: nums[i] < nums[stack.last]
+ 
+ - Larger values are discarded because they are dominated:
+    - An earlier index with a smaller or equal value will always produce a better (wider) ramp
+ 
+ ------------------------------------------------------------
+ 
+ Pass 2 (Match & Maximize Width):
+ 
+ - Traverse right → left
+ - For each index j:
+ 
+     While stack is not empty AND:
+         nums[j] > nums[stack.last]
+ 
+         → Valid ramp found
+ 
+         - Compute width (j - i)
+         - Update maxWidth
+ 
+         - Pop from stack
+ 
+         → This is safe because:
+            we have found the maximum possible j for this i
+ 
+ - Continue checking earlier candidates for additional ramps
+ 
+ */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input: [Int]) -> Int {
+    var stack:[Int] = []
+    var maxWidth: Int = 0
     
+    // Pass 1 - Build stack in decreasing order (left-to-right)
+    for i in 0..<input.count {
+        if let lastIndex = stack.last, input[i] < input[lastIndex] {
+            stack.append(i)
+        } else if stack.isEmpty {
+            stack.append(i)
+        }
+    }
+    
+    // Pass 2 - Match a valid ramp with stack (right-to-left)
+    for j in stride(from: input.count - 1, through: 0, by: -1) {
+        while let i = stack.last, input[j] > input[i] {
+            maxWidth = max(maxWidth, j - i)
+            stack.removeLast()
+        }
+        
+        if stack.isEmpty { break }
+    }
 
 
-    return []
+    return maxWidth
 }
 
 optimized([5,4,3,2,8])
@@ -422,5 +481,60 @@ optimized([5,4,3,2,8])
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
-
+ Initial:
+    Input: [5,4,3,2,8]
+    stack = []
+    maxWidth = 0
+ --------------------------------------------------
+ 
+ Phase 1 (Build Decreasing Stack)
+ 
+ i = 0
+ stack is empty → append
+ stack = [0]
+ 
+ i = 1
+ input[1] (4) < input[0] (5) → append
+ stack = [0, 1]
+ 
+ i = 2
+ input[2] (3) < input[1] (4) → append
+ stack = [0, 1, 2]
+ 
+ i = 3
+ input[3] (2) < input[2] (3) → append
+ stack = [0, 1, 2, 3]
+ 
+ i = 4
+ input[4] (8) > input[3] (2) → skip (dominated)
+ 
+ Final stack = [0, 1, 2, 3]
+ Values = [5, 4, 3, 2] → strictly decreasing
+ 
+ --------------------------------------------------
+ 
+ Phase 2 (Right → Left Matching)
+ 
+ j = 4 (value = 8)
+ 
+ Stack: [0, 1, 2, 3]
+ 
+ → 8 > 2 → width = 1 → maxWidth = 1 → pop → [0, 1, 2]
+ → 8 > 3 → width = 2 → maxWidth = 2 → pop → [0, 1]
+ → 8 > 4 → width = 3 → maxWidth = 3 → pop → [0]
+ → 8 > 5 → width = 4 → maxWidth = 4 → pop → []
+ 
+ Stack is now empty → stop early
+ 
+ --------------------------------------------------
+ 
+ Key Validation Insights:
+ 
+ - Rightmost element (8) resolves ALL candidates in one pass
+ - Each popped index i is permanently resolved because:
+    this is the largest possible j for that i
+ - Greedy popping ensures O(n) behavior
+ - Earlier indices produce larger widths, which is why they are resolved last
+ 
+ Final Result: maxWidth = 4
 */
