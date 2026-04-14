@@ -309,23 +309,129 @@ twoPointer(&arr2)
 
 // MARK: - Phase 7: Re-Code (After Break)
 
-/*
 
+/*
  Invariant:
+
+ - Elements outside the range [left, right] are already in their correct reversed positions
+
  Key Insight:
+
+ - Use two pointers:
+     left → start of array
+     right → end of array
+
+ - While left < right:
+     - Swap elements at left and right
+     - Move pointers inward
+
+ - Each step correctly places two elements into their final positions
 */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input: inout [String]){
     
+    var left: Int = 0
+    var right: Int = input.count - 1
 
-
-    return []
+    while left < right {
+        // input.swapAt(left, right)
+        let temp = input[left]
+        input[left] = input[right]
+        input[right] = temp
+        
+        left += 1
+        right -= 1
+        
+    }
 }
 
-optimized([1, 3, 2, 4])
+var arr3 = ["d", "f", "e", "n", "g"]
+
+optimized(&arr3)
 
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
 
+ Example:
+
+ input:  ["d", "f", "e", "n", "g"]
+ output: ["g", "n", "e", "f", "d"]
+
+ --------------------------------------------------
+ 
+ Initial State:
+
+ input = ["d", "f", "e", "n", "g"]
+
+ left = 0
+ right = 4
+
+ --------------------------------------------------
+ Iteration 1:
+
+ left = 0, right = 4
+
+ Current:
+ ["d", "f", "e", "n", "g"]
+   ^                   ^
+
+ Swap:
+ temp = "d"
+ input[0] = input[4] → "g"
+ ["g", "f", "e", "n", "g"]
+
+ input[4] = temp → "d"
+ ["g", "f", "e", "n", "d"]
+
+ Move pointers:
+ left = 1
+ right = 3
+
+ Result:
+ ["g", "f", "e", "n", "d"]
+   ✔              ✔
+ (finalized)   (finalized)
+
+ --------------------------------------------------
+ Iteration 2:
+
+ left = 1, right = 3
+
+ Current:
+ ["g", "f", "e", "n", "d"]
+        ^         ^
+
+ Swap:
+ temp = "f"
+ input[1] = input[3] → "n"
+ ["g", "n", "e", "n", "d"]
+
+ input[3] = temp → "f"
+ ["g", "n", "e", "f", "d"]
+
+ Move pointers:
+ left = 2
+ right = 2
+
+ Result:
+ ["g", "n", "e", "f", "d"]
+   ✔    ✔         ✔     ✔
+ (finalized except middle)
+
+ --------------------------------------------------
+ Termination:
+
+ left = 2, right = 2
+
+ - Pointers have met
+ - Middle element does not need swapping
+
+ --------------------------------------------------
+
+ Final Output:
+
+ ["g", "n", "e", "f", "d"]
+
+ --------------------------------------------------
 */
