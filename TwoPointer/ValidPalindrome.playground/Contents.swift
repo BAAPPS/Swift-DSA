@@ -269,20 +269,157 @@ twoPointer("A man, a plan, a canal: Panama")
 /*
 
  Invariant:
+    - At every step, all previously compared characters are equal after normalization.
  Key Insight:
+ 
+    - Use Two Pointer:
+ 
+     left → start of array
+     right → end of array
+ 
+    - While left < right:
+     
+        Check for nonalphanumerics for left element
+            - If found, increment left pointer to skip
+     
+        Check for nonalphanumerics for right element
+            - If found, decrement right pointer to skip
+ 
+        Check if left element is not the same as right element
+ 
+            - return false
+ 
+        increment left pointer
+        decrement right pointer
+     
 */
 
-func optimized(_ input: [Int]) -> [Int] {
-    
-
-
-    return []
+func isAlpha(_ char: Character) -> Bool {
+    return char.isLetter || char.isNumber
 }
 
-optimized([1, 3, 2, 4])
+func optimized(_ input: String) -> Bool{
+    
+    var left = input.startIndex
+    var right = input.index(before:input.endIndex)
+
+    while left < right {
+        
+        
+        while left < right && !isAlpha(input[left]) {
+            left = input.index(after: left)
+        }
+        
+        while left < right && !isAlpha(input[right]) {
+            right = input.index(before: right)
+        }
+        
+        if input[left].lowercased() != input[right].lowercased() {
+            return false
+        }
+        
+        left = input.index(after: left)
+        
+        right = input.index(before: right)
+        
+    }
+    return true
+}
+
+optimized("A man, nama")
 
 /*
- Phase 7 Validation Trace
+ Phase 7: Validation Trace
  --------------------------------------------------
 
+ Input:
+ "A man, nama"
+
+ Normalization Rule:
+ - Ignore non-alphanumeric characters
+ - Compare case-insensitively
+
+ --------------------------------------------------
+
+ Initial State:
+
+ left  → 'A'  (startIndex)
+ right → 'a'  (index before endIndex)
+
+ --------------------------------------------------
+
+ Step 1:
+
+ left  = 'A' → valid
+ right = 'a' → valid
+
+ Compare:
+ 'a' == 'a' ✅
+
+ Move:
+ left  → next → ' '
+ right → prev → 'm'
+
+ --------------------------------------------------
+
+ Step 2:
+
+ left  = ' ' → invalid → skip → 'm'
+ right = 'm' → valid
+
+ Compare:
+ 'm' == 'm' ✅
+
+ Move:
+ left  → next → 'a'
+ right → prev → 'a'
+
+ --------------------------------------------------
+
+ Step 3:
+
+ left  = 'a' → valid
+ right = 'a' → valid
+
+ Compare:
+ 'a' == 'a' ✅
+
+ Move:
+ left  → next → 'n'
+ right → prev → 'n'
+
+ --------------------------------------------------
+
+ Step 4:
+
+ left  = 'n' → valid
+ right = 'n' → valid
+
+ Compare:
+ 'n' == 'n' ✅
+
+ Move:
+ left  → next → ','
+ right → prev → ' '
+
+ --------------------------------------------------
+
+ Step 5:
+
+ left  = ',' → invalid → skip → ' '
+ left  = ' ' → invalid → skip → 'n'
+
+ right = ' ' → invalid → skip → ','
+ right = ',' → invalid → skip → 'n'
+
+ Now:
+ left == right ('n')
+
+ --------------------------------------------------
+
+ Termination:
+
+ left >= right → stop
+
+ All comparisons matched → return true
 */
