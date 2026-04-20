@@ -2,8 +2,6 @@
 /*
  MARK: - Problem 3: Two Sum II (Sorted)
 
- Level: Beginner
-
  Goal:
  Find two numbers such that they add up to a target.
 
@@ -249,20 +247,97 @@ twoPointer([0,1,2,7], 7)
 /*
 
  Invariant:
+ 
+    - At any point, all pairs outside the current [left, right] window cannot sum to the target
+    
+ Justification:
+ 
+     - If sum < target, increasing the left pointer is the only way to increase the sum,
+     because all values to the left are smaller.
+
+     - If sum > target, decreasing the right pointer is the only way to decrease the sum,
+     because all values to the right are larger.
+ 
+    - Therefore, we can safely eliminate portions of the search space at each step
+ 
  Key Insight:
+ 
+    - Use Two Pointer:
+ 
+        - Left pointer pointing at index 0
+ 
+        - Right pointer pointing at index n - 1
+ 
+    - While left < right
+ 
+        - If sum < target
+ 
+            - Increment left pointer to check for a larger value
+ 
+        - Else if sum > target
+ 
+            - Decrement right pointer to check for a smaller value
+ 
+        - Otherwise, we have a valid pair that equals target
+ 
+            - return [left + 1, right + 1]
+ 
+    - If no valid pairs exists, return []
+ 
 */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input: [Int], _ target: Int) -> [Int] {
     
-
-
+    var left: Int = 0
+    
+    var right: Int = input.count - 1
+    
+    while left < right {
+       let sum = input[left] + input[right]
+        
+        if sum < target {
+            left += 1
+        } else if sum > target {
+            right -= 1
+        } else {
+            return [left + 1, right + 1]
+        }
+    }
+    
     return []
 }
 
-optimized([1, 3, 2, 4])
+optimized([1, 2, 3, 4], 6)
 
 /*
- Phase 7 Validation Trace
+ Phase 7: Validation Trace
  --------------------------------------------------
 
+ Example:
+ input = [1,2,3,4], target = 6
+
+ --------------------------------------------------
+
+ Initial State:
+ left = 0 (value = 1)
+ right = 3 (value = 4)
+
+ Step 1:
+ sum = 1 + 4 = 5 < 6
+ → sum too small, move left pointer right
+
+ left = 1
+
+ --------------------------------------------------
+
+ Step 2:
+ left = 1 (value = 2)
+ right = 3 (value = 4)
+
+ sum = 2 + 4 = 6 == 6
+ → valid pair found
+
+ return [2, 4]
+
+ --------------------------------------------------
 */
