@@ -223,9 +223,34 @@ twoPointer(&arr2)
     - All indices < left are guaranteed to be non-zero and in correct order
  
  Key Insight:
+ 
+    - Using Two Pointers:
+ 
+        - Left pointer tracks the position to place the next non-zero element
+        - Right pointer scans the array
+ 
+    - At each step:
+ 
+        - If input[right] != 0:
+ 
+            - Swap places with input[left]
+ 
+            - Increment left pointer to place the next available non-zero element
+ 
 */
 
 func optimized(_ input: inout [Int]){
+    
+    var leftIndex: Int = 0
+    
+    for rightIndex in 0..<input.count {
+        
+        if input[rightIndex] != 0 {
+            input.swapAt(leftIndex, rightIndex)
+            leftIndex += 1
+        }
+        
+    }
     
 }
 
@@ -236,5 +261,58 @@ optimized(&arr3)
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ Initial:
+ [1, 3, 0, 2, 4, 0]
 
+ --------------------------------------------------
+
+ leftIndex = 0, rightIndex = 0
+ input[0] = 1 → non-zero
+
+ leftIndex == rightIndex → already correct position
+ leftIndex = 1
+
+ --------------------------------------------------
+
+ leftIndex = 1, rightIndex = 1
+ input[1] = 3 → non-zero
+
+ leftIndex == rightIndex → already correct position
+ leftIndex = 2
+
+ --------------------------------------------------
+
+ leftIndex = 2, rightIndex = 2
+ input[2] = 0 → skip
+
+ --------------------------------------------------
+
+ leftIndex = 2, rightIndex = 3
+ input[3] = 2 → non-zero
+
+ swap(2, 3)
+ → [1, 3, 2, 0, 4, 0]
+
+ leftIndex = 3
+
+ --------------------------------------------------
+
+ leftIndex = 3, rightIndex = 4
+ input[4] = 4 → non-zero
+
+ swap(3, 4)
+ → [1, 3, 2, 4, 0, 0]
+
+ leftIndex = 4
+
+ --------------------------------------------------
+
+ leftIndex = 4, rightIndex = 5
+ input[5] = 0 → skip
+
+ --------------------------------------------------
+
+ Final:
+ [1, 3, 2, 4, 0, 0]
+ 
 */
