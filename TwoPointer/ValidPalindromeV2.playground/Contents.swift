@@ -348,26 +348,187 @@ twoPointer("abca")
  Final Outcome:
 
  If no more than one mismatch requires deletion, the string can be considered a valid palindrome.
+ 
+ ------------------------------------------------------------
+ 
+ Pattern Learned:
+
+ In the regular valid palindrome problem, we compare characters from both ends of the string using two pointers.
+
+ In this variation, since we are allowed to delete at most one character, we still compare from both ends normally.
+
+ However, at the first mismatch, we are allowed one deletion, so we branch into two possibilities:
+     - skip the left character
+     - skip the right character
+
+ We then validate each resulting substring independently as a palindrome.
 */
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
+Invariant:
+- All characters outside the current [left, right] window are symmetric, and we have not yet used our single allowed deletion.
 
- Invariant:
- Key Insight:
+Key Insight:
+
+1. Helper Function (Palindrome Check):
+ 
+   - Use two pointers (left, right)
+   - While left < right:
+        - If characters mismatch → return false
+        - Move both pointers inward
+   - If loop completes → return true
+
+2. Main Logic (Two Pointer):
+
+   - Initialize left at start, right at end
+   - While left < right:
+        - If input[left] == input[right]:
+            → move both pointers inward
+        - Else (first mismatch):
+            → try one deletion:
+                return isPalindrome(left + 1, right)
+                    OR
+                       isPalindrome(left, right - 1)
+
+   - If no mismatch occurs → return true
 */
 
-func optimized(_ input: String) -> Bool {
+func isPalindrome(_ input: String, _ left: String.Index,_ right: String.Index) -> Bool {
+    var l = left
+    var r = right
     
-
-
+    while l < r {
+        if input[l] != input[r] {
+            return false
+        }
+        l = input.index(after: l)
+        r = input.index(before: r)
+    }
+    
     return true
 }
 
-optimized("baccab")
+func optimized(_ input: String) -> Bool {
+    
+    var left: String.Index = input.startIndex
+    var right: String.Index = input.index(before: input.endIndex)
+    
+    while left < right {
+        if input[left] != input[right] {
+            return isPalindrome(input, input.index(after:left), right) || isPalindrome(input, left,  input.index(before:right))
+        }
+        
+        left = input.index(after:left)
+        right = input.index(before:right)
+    }
+    
+
+    return false
+}
+
+optimized("baccdab")
 
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
 
+ Example 1: No mismatch case
+ 
+ Input: "baccab"
+
+ Indices:
+ 0  1  2  3  4  5
+ b  a  c  c  a  b
+
+ --------------------------------------------------
+
+ Initial:
+ left = 0 ('b')
+ right = 5 ('b')
+
+ --------------------------------------------------
+
+ Step 1:
+ 'b' == 'b' ✔
+ → move inward
+
+ left = 1
+ right = 4
+
+ --------------------------------------------------
+
+ Step 2:
+ 'a' == 'a' ✔
+ → move inward
+
+ left = 2
+ right = 3
+
+ --------------------------------------------------
+
+ Step 3:
+ 'c' == 'c' ✔
+ → move inward
+
+ left = 3
+ right = 2
+
+ --------------------------------------------------
+
+ Loop ends (left >= right)
+
+ No mismatches encountered
+ → return true
+
+ --------------------------------------------------
+ 
+ Example 2: Mismatch case
+
+ Input: "baccdab"
+
+ Indices:
+ 0  1  2  3  4  5  6
+ b  a  c  c  d  a  b
+ --------------------------------------------------
+
+ Initial:
+ left = 0 ('b')
+ right = 6 ('b')
+
+ --------------------------------------------------
+
+ Step 1:
+ 'b' == 'b' ✔
+ → move inward
+
+ left = 1
+ right = 5
+
+ --------------------------------------------------
+
+ Step 2:
+ 'a' == 'a' ✔
+ → move inward
+
+ left = 2
+ right = 4
+
+ --------------------------------------------------
+
+ Step 3:
+ 'c' != 'd' (FIRST mismatch)
+
+ → Try skipping left:
+    isPalindrome(3, 4) → "cd"
+        'c' != 'd' → false
+
+ → Try skipping right:
+    isPalindrome(2, 3) → "cc"
+        'c' == 'c'  → true
+
+ At least one valid → return true
+
+ --------------------------------------------------
+ 
 */
