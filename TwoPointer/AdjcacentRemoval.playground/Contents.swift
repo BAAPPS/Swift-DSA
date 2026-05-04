@@ -304,22 +304,144 @@ TwoPointer(str1)
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
+Invariant:
 
- Invariant:
- Key Insight:
+- At any point, chars[0..<slow] represents the current valid result
+  with no adjacent duplicates.
+
+------------------------------------------------------------
+
+Key Insight:
+
+- Convert the string into an array to enable in-place mutation
+
+- Use two pointers to simulate a stack:
+    - slow pointer (write pointer / stack top)
+    - fast pointer (read pointer)
+
+------------------------------------------------------------
+
+Algorithm:
+
+- Traverse the array using the fast pointer
+
+    - If the current character matches the last written character:
+        → simulate pop by decrementing slow
+
+    - Otherwise:
+        → write the current character at index slow
+        → increment slow
+
+------------------------------------------------------------
+
+Final Result:
+
+- The valid result is stored in chars[0..<slow]
 */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input: String) -> String {
+    var chars = Array(input)
+    var slow = 0
     
-
-
-    return []
+    for fast in 0..<chars.count {
+        if slow > 0 && chars[slow - 1] == chars[fast] {
+            slow -= 1 // pop
+        } else {
+            chars[slow] = chars[fast] // push
+            slow += 1
+        }
+    }
+    
+    return String(chars[0..<slow])
 }
 
-optimized([1, 3, 2, 4])
+optimized("azxxzy")
 
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ Example:
+ 
+ input = "azxxzy"
+ output = "ay"
+ 
+ --------------------------------------------------
+ Initial:
+ chars = ["a","z","x","x","z","y"]
+ slow = 0
+ 
+ --------------------------------------------------
+ fast = 0
+ chars[fast] = "a"
 
+ slow == 0 → push
+
+ chars[0] = "a"
+ slow = 1
+
+ valid range: chars[0..<1] → ["a"]
+
+ --------------------------------------------------
+ fast = 1
+ chars[fast] = "z"
+
+ compare with chars[slow - 1] = "a"
+ "a" != "z" → push
+
+ chars[1] = "z"
+ slow = 2
+
+ valid range: chars[0..<2] → ["a","z"]
+
+ --------------------------------------------------
+ fast = 2
+ chars[fast] = "x"
+
+ compare with chars[slow - 1] = "z"
+ "z" != "x" → push
+
+ chars[2] = "x"
+ slow = 3
+
+ valid range: chars[0..<3] → ["a","z","x"]
+
+ --------------------------------------------------
+ fast = 3
+ chars[fast] = "x"
+
+ compare with chars[slow - 1] = "x"
+ "x" == "x" → pop
+
+ slow = 2
+
+ valid range: chars[0..<2] → ["a","z"]
+
+ --------------------------------------------------
+ fast = 4
+ chars[fast] = "z"
+
+ compare with chars[slow - 1] = "z"
+ "z" == "z" → pop
+
+ slow = 1
+
+ valid range: chars[0..<1] → ["a"]
+
+ --------------------------------------------------
+ fast = 5
+ chars[fast] = "y"
+
+ compare with chars[slow - 1] = "a"
+ "a" != "y" → push
+
+ chars[1] = "y"
+ slow = 2
+
+ valid range: chars[0..<2] → ["a","y"]
+
+ --------------------------------------------------
+ End:
+
+ return String(chars[0..<slow]) → "ay"
+ --------------------------------------------------
 */
