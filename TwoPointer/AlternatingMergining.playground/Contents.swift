@@ -316,20 +316,127 @@ twoPointer("aefgm", "hij")
 /*
 
  Invariant:
+ 
+    - At any point during traversal, result contains the correct alternating merge of all processed characters from input1 and input2.
+
+ ------------------------------------------------------------
+
  Key Insight:
+    
+    - Create a new string to store the merged result
+    - Use Two Pointers with String.Index:
+    
+        - i traverses input1
+        - j traverses input2
+ 
+    - Continue while either string still has characters:
+        while i < input1.endIndex || j < input2.endIndex
+ 
+    - At each step:
+        - If i is valid:
+            → append input1[i]
+            → move i forward
+
+        - If j is valid:
+            → append input2[j]
+            → move j forward
+
+ ------------------------------------------------------------
+
+ Key Idea:
+ 
+    - We independently check each pointer because
+      the strings may have different lengths
+
+    - The traversal naturally handles leftover characters
+      without requiring separate logic
+
 */
 
-func optimized(_ input: [Int]) -> [Int] {
+func optimized(_ input1: String, _ input2: String) -> String {
     
+    var result: String = ""
+    var i = input1.startIndex
+    var j = input2.startIndex
+    
+    while i < input1.endIndex || j < input2.endIndex {
+        if i < input1.endIndex {
+            result.append(input1[i])
+            i = input1.index(after: i)
+        }
+        
+        if j < input2.endIndex {
+            result.append(input2[j])
+            j = input2.index(after: j)
+        }
+    }
 
 
-    return []
+    return result
 }
 
-optimized([1, 3, 2, 4])
+optimized("dny", "en")
 
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+
+ Initial:
+
+ input1 = "dny"
+ input2 = "en"
+
+ result = ""
+
+ i = 0
+ j = 0
+
+ --------------------------------------------------
+
+ i < 3 || j < 2
+ 0 < 3 || 0 < 2 → true
+
+ Append input1[i] = "d"
+ result = "d"
+ i = 1
+
+ Append input2[j] = "e"
+ result = "de"
+ j = 1
+
+ --------------------------------------------------
+
+ i < 3 || j < 2
+ 1 < 3 || 1 < 2 → true
+
+ Append input1[i] = "n"
+ result = "den"
+ i = 2
+
+ Append input2[j] = "n"
+ result = "denn"
+ j = 2
+
+ --------------------------------------------------
+
+ i < 3 || j < 2
+ 2 < 3 || 2 < 2 → true
+
+ Append input1[i] = "y"
+ result = "denny"
+ i = 3
+
+ j == 2 → skip input2
+
+ --------------------------------------------------
+
+ i < 3 || j < 2
+ 3 < 3 || 2 < 2 → false
+
+ Loop ends
+
+ --------------------------------------------------
+
+ Final result = "denny"
 
 */
