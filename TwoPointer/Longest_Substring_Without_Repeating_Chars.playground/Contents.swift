@@ -451,16 +451,66 @@ twoPointerSW("abcabdcbb")
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
-
  Invariant:
+ 
+    - At any point during traversal, all characters inside the current window are unique.
+
+ ------------------------------------------------------------
+
  Key Insight:
+ 
+    - Convert the string into an array of characters for easier indexing and window calculations.
+
+    - Use:
+        - longest → stores the maximum valid substring length found so far
+        - Set → tracks characters currently inside the window
+
+ ------------------------------------------------------------
+
+ Sliding Window (Two Pointer Pattern):
+ 
+    - left pointer:
+        → shrinks the window when duplicates appear
+
+    - right pointer:
+        → expands the window forward
+
+ ------------------------------------------------------------
+
+ Algorithm:
+ 
+    - Traverse using the right pointer
+
+    - While chars[right] already exists in the Set:
+        → remove chars[left] from the Set
+        → move left forward to shrink the window
+
+    - Once the window becomes valid again:
+        → insert chars[right] into the Set
+        → update longest using:
+              right - left + 1
+
 */
 
 func optimized(_ input: String) -> Int {
+    var chars = Array(input)
+    var seen: Set<Character> = []
+    var longest: Int = 0
     
+    var left = 0
+    
+    for right in 0..<chars.count {
+        while seen.contains(chars[right]) {
+            seen.remove(chars[left])
+            left += 1
+        }
+        
+        seen.insert(chars[right])
+        longest = max(longest, right - left + 1)
+        
+    }
 
-
-    return 0
+    return longest
 }
 
 optimized("abaebcd")
@@ -469,4 +519,157 @@ optimized("abaebcd")
  Phase 7 Validation Trace
  --------------------------------------------------
 
+ Example:
+
+ input: "abaebcd"
+ output: 5
+
+ --------------------------------------------------
+ Initial:
+
+ chars = ["a","b","a","e","b","c","d"]
+           R
+
+ left = 0
+ seen = []
+ longest = 0
+
+ --------------------------------------------------
+ right = 0
+ chars[right] = "a"
+
+ seen does not contain "a"
+ → insert "a"
+
+ seen = ["a"]
+
+ chars = ["a","b","a","e","b","c","d"]
+          L/R
+
+ window = "a"
+
+ longest = max(0, 1) = 1
+
+ --------------------------------------------------
+ right = 1
+ chars[right] = "b"
+
+ seen does not contain "b"
+ → insert "b"
+
+ seen = ["a", "b"]
+
+ chars = ["a","b","a","e","b","c","d"]
+           L   R
+
+ window = "ab"
+
+ longest = max(1, 2) = 2
+
+ --------------------------------------------------
+ right = 2
+ chars[right] = "a"
+
+ seen contains "a"
+
+ chars = ["a","b","a","e","b","c","d"]
+           L       R
+
+ → remove chars[left] = "a"
+ → seen = ["b"]
+ → left += 1
+
+ chars = ["a","b","a","e","b","c","d"]
+               L   R
+
+ window valid again
+
+ → insert "a"
+
+ seen = ["b", "a"]
+
+ window = "ba"
+
+ longest = max(2, 2) = 2
+
+ --------------------------------------------------
+ right = 3
+ chars[right] = "e"
+
+ seen does not contain "e"
+ → insert "e"
+
+ seen = ["b", "a", "e"]
+
+ chars = ["a","b","a","e","b","c","d"]
+               L       R
+
+ window = "bae"
+
+ longest = max(2, 3) = 3
+
+ --------------------------------------------------
+ right = 4
+ chars[right] = "b"
+
+ seen contains "b"
+
+ chars = ["a","b","a","e","b","c","d"]
+               L           R
+
+ → remove chars[left] = "b"
+ → seen = ["a", "e"]
+ → left += 1
+
+ chars = ["a","b","a","e","b","c","d"]
+                   L       R
+
+ window valid again
+
+ → insert "b"
+
+ seen = ["a", "e", "b"]
+
+ window = "aeb"
+
+ longest = max(3, 3) = 3
+
+ --------------------------------------------------
+ right = 5
+ chars[right] = "c"
+
+ seen does not contain "c"
+ → insert "c"
+
+ seen = ["a", "e", "b", "c"]
+
+ chars = ["a","b","a","e","b","c","d"]
+                   L           R
+
+ window = "aebc"
+
+ longest = max(3, 4) = 4
+
+ --------------------------------------------------
+ right = 6
+ chars[right] = "d"
+
+ seen does not contain "d"
+ → insert "d"
+
+ seen = ["a", "e", "b", "c", "d"]
+
+ chars = ["a","b","a","e","b","c","d"]
+                   L               R
+
+ window = "aebcd"
+
+ longest = max(4, 5) = 5
+
+ --------------------------------------------------
+
+ Final substring = "aebcd"
+
+ longest = 5
 */
+
