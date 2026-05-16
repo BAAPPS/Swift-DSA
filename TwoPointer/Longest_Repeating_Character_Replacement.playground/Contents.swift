@@ -450,14 +450,78 @@ twoPointerSW("AABABBA", 1)
 /*
 
  Invariant:
+    - At any point during traversal, the current window is valid, meaning it can be transformed into a substring of repeating characters using at most k replacements.
+
+ ------------------------------------------------------------
  Key Insight:
+
+    - Convert the string into an array of characters for easier indexing and window calculations.
+
+    - Use:
+        - longest
+            → stores the maximum valid substring length
+
+        - Hash Map
+            → tracks character frequencies inside the window
+
+        - maxFreq
+            → tracks the highest character frequency
+              inside the current window
+
+ ------------------------------------------------------------
+
+ Sliding Window (Two Pointer Pattern):
+
+    - left pointer
+        → shrinks the window when it becomes invalid
+
+    - right pointer
+        → expands the window forward
+
+ ------------------------------------------------------------
+ Algorithm:
+
+    - Traverse using the right pointer
+
+    - Insert chars[right] into frequency map
+
+    - Update maxFreq using the current character frequency
+
+    - While the window is invalid:
+
+            (windowSize - maxFreq) > k
+
+        → decrement frequency of chars[left]
+        → shrink window from the left
+
+    - Once valid:
+        → update longest substring length
+
 */
 
 func optimized(_ input: String, _ k: Int) -> Int {
+    var chars = Array(input)
+    var freq: [Character: Int] = [:]
+    var longest: Int = 0
+    var left: Int = 0
+    var maxFreq: Int = 0
+    
+    for right in 0..<chars.count {
+        freq[chars[right], default: 0] += 1
+        maxFreq = max(maxFreq, freq[chars[right]]!)
+        
+        while (right - left + 1) - maxFreq > k {
+            freq[chars[left]]! -= 1
+            left += 1
+        }
+        
+        longest = max(longest, right - left + 1)
+        
+    }
     
 
 
-    return 0
+    return longest
 }
 
 optimized("AABABBA", 1)
@@ -465,5 +529,210 @@ optimized("AABABBA", 1)
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ Example:
+ Input:  "AABABBA", k = 1
+ Output: 4
+
+ --------------------------------------------------
+ Initial:
+
+ chars   = ["A","A","B","A","B","B","A"]
+
+ longest = 0
+ maxFreq = 0
+
+ left = 0
+
+ freq = [:]
+
+ --------------------------------------------------
+ right = 0
+
+ chars[right] = "A"
+
+ freq = ["A": 1]
+
+ maxFreq = max(0, 1) → 1
+
+ windowSize = (0 - 0 + 1) = 1
+
+ replacementsNeeded = 1 - 1 = 0
+
+ valid window
+
+ longest = max(0, 1) → 1
+
+ window = ["A"]
+           L R
+
+ --------------------------------------------------
+ right = 1
+
+ chars[right] = "A"
+
+ freq = ["A": 2]
+
+ maxFreq = max(1, 2) → 2
+
+ windowSize = (1 - 0 + 1) = 2
+
+ replacementsNeeded = 2 - 2 = 0
+
+ valid window
+
+ longest = max(1, 2) → 2
+
+ window = ["A","A"]
+            L   R
+
+ --------------------------------------------------
+ right = 2
+
+ chars[right] = "B"
+
+ freq = ["A": 2, "B": 1]
+
+ maxFreq = max(2, 1) → 2
+
+ windowSize = (2 - 0 + 1) = 3
+
+ replacementsNeeded = 3 - 2 = 1
+
+ valid window
+
+ longest = max(2, 3) → 3
+
+ window = ["A","A","B"]
+            L       R
+
+ --------------------------------------------------
+ right = 3
+
+ chars[right] = "A"
+
+ freq = ["A": 3, "B": 1]
+
+ maxFreq = max(2, 3) → 3
+
+ windowSize = (3 - 0 + 1) = 4
+
+ replacementsNeeded = 4 - 3 = 1
+
+ valid window
+
+ longest = max(3, 4) → 4
+
+ window = ["A","A","B","A"]
+            L           R
+
+ --------------------------------------------------
+ right = 4
+
+ chars[right] = "B"
+
+ freq = ["A": 3, "B": 2]
+
+ maxFreq = max(3, 2) → 3
+
+ windowSize = (4 - 0 + 1) = 5
+
+ replacementsNeeded = 5 - 3 = 2
+
+ invalid window
+
+ --------------------------------------------------
+ shrink window:
+
+ freq["A"] -= 1
+
+ freq = ["A": 2, "B": 2]
+
+ left = 1
+
+ new windowSize = (4 - 1 + 1) = 4
+
+ replacementsNeeded = 4 - 3 = 1
+
+ valid again
+
+ longest = max(4, 4) → 4
+
+ window = ["A","B","A","B"]
+                L       R
+
+ --------------------------------------------------
+ right = 5
+
+ chars[right] = "B"
+
+ freq = ["A": 2, "B": 3]
+
+ maxFreq = max(3, 3) → 3
+
+ windowSize = (5 - 1 + 1) = 5
+
+ replacementsNeeded = 5 - 3 = 2
+
+ invalid window
+
+ --------------------------------------------------
+ shrink window:
+
+ freq["A"] -= 1
+
+ freq = ["A": 1, "B": 3]
+
+ left = 2
+
+ new windowSize = (5 - 2 + 1) = 4
+
+ replacementsNeeded = 4 - 3 = 1
+
+ valid again
+
+ longest = max(4, 4) → 4
+
+ window = ["B","A","B","B"]
+                    L   R
+
+ --------------------------------------------------
+ right = 6
+
+ chars[right] = "A"
+
+ freq = ["A": 2, "B": 3]
+
+ maxFreq = max(3, 2) → 3
+
+ windowSize = (6 - 2 + 1) = 5
+
+ replacementsNeeded = 5 - 3 = 2
+
+ invalid window
+
+ --------------------------------------------------
+ shrink window:
+
+ freq["B"] -= 1
+
+ freq = ["A": 2, "B": 2]
+
+ left = 3
+
+ new windowSize = (6 - 3 + 1) = 4
+
+ replacementsNeeded = 4 - 3 = 1
+
+ valid again
+
+ longest = max(4, 4) → 4
+
+ window = ["A","B","B","A"]
+                       L R
+
+ --------------------------------------------------
+ Final Result:
+
+ longest = 4
 
 */
