@@ -298,7 +298,8 @@ bruteForce("AABABBA", 1)
 /*
  Observation from Brute Force:
  
- - For every starting index, we rebuild the frequency map and recompute character frequencies repeatedly.
+ - For every starting index, we rebuild the frequency map
+ 
 
  - Many substrings overlap, causing redundant rescanningand leading to O(n²) time complexity.
 
@@ -351,7 +352,7 @@ bruteForce("AABABBA", 1)
       inside the current window
 */
 
-// MARK: - Phase 4: Optimized Monotonic Decreasing Stack Solution
+// MARK: - Phase 4: Optimized Two Pointer (Sliding Window) Solution
 
 func twoPointerSW(_ input: String, _ k: Int) -> Int {
     var chars: Array = Array(input)
