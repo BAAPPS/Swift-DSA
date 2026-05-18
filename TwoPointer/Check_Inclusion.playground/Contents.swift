@@ -392,14 +392,106 @@ twoPointerSW("ab", "eidbaooo")
 
 // MARK: - Phase 7: Re-Code (After Break)
 
+
 /*
 
  Invariant:
+
+    - At any point during traversal, s2Map stores the character frequencies
+      of the current sliding window chars2[left...right]
+
+ ------------------------------------------------------------
  Key Insight:
+
+    - Convert both strings into arrays of characters
+      for easier indexing and window traversal
+
+    - Use:
+        - s1Map → stores required character frequencies
+        - s2Map → stores frequencies inside current window
+        - left pointer → shrinks the window
+        - right pointer → expands the window
+
+ ------------------------------------------------------------
+
+ Fixed-Size Sliding Window:
+
+    - First, traverse s1 and build its frequency map
+    - The size of s1 becomes the required fixed window size for traversal in s2
+
+ ------------------------------------------------------------
+
+ Algorithm:
+
+    - Traverse s2 using the right pointer
+
+    - Insert chars2[right] into s2Map
+
+    - If current window size exceeds windowSize:
+        → decrement chars2[left] frequency
+        → if frequency becomes 0:
+                remove character from hashmap
+        → increment left pointer
+
+    - After maintaining the fixed window:
+        → compare s1Map and s2Map
+
+        - If both maps are equal:
+            → permutation exists
+            → return true
+
+ ------------------------------------------------------------
+
+ Final Result:
+
+    - Return false if no valid permutation
+      window exists after full traversal
+
 */
 
 func optimized(_ s1: String, _ s2: String) -> Bool {
-    
+
+    // Edge Case
+    if s1.count > s2.count {
+        return false
+    }
+
+    let chars1 = Array(s1)
+    let chars2 = Array(s2)
+
+    var s1Map: [Character: Int] = [:]
+
+    for char in chars1 {
+        s1Map[char, default: 0] += 1
+    }
+
+    let windowSize = chars1.count
+
+    var s2Map: [Character: Int] = [:]
+
+    var left = 0
+
+    for right in 0..<chars2.count {
+
+        s2Map[chars2[right], default: 0] += 1
+
+        // Shrink if window exceeds fixed size
+        if (right - left + 1) > windowSize {
+
+            s2Map[chars2[left]]! -= 1
+
+            if s2Map[chars2[left]] == 0 {
+                s2Map.removeValue(forKey: chars2[left])
+            }
+
+            left += 1
+        }
+
+        // Compare current window
+        if s1Map == s2Map {
+            return true
+        }
+    }
 
     return false
 }
@@ -410,4 +502,105 @@ optimized("ab", "eidbaooo")
  Phase 7 Validation Trace
  --------------------------------------------------
 
+ Example:
+ Input:  s1 = "ab", s2 = "eidbaooo"
+ Output: true
+
+ --------------------------------------------------
+
+ Initial:
+
+ s1.count < s2.count → continue
+
+ chars1 = ["a", "b"]
+
+ chars2 = ["e", "i", "d", "b", "a", "o", "o", "o"]
+
+ s1Map = ["a": 1, "b": 1]
+
+ windowSize = 2
+
+ left = 0
+
+ ------------------------------------------------------------
+ right = 0
+
+ s2Map = ["e": 1]
+
+ window size = (0 - 0 + 1) = 1 < 2
+
+ → no comparison yet
+
+ ------------------------------------------------------------
+ right = 1
+
+ s2Map = ["e": 1, "i": 1]
+
+ window size = (1 - 0 + 1) = 2 == 2
+
+ → compare s2Map with s1Map
+ → ["e","i"] ≠ ["a","b"]
+
+ ------------------------------------------------------------
+ right = 2
+
+ s2Map = ["e": 1, "i": 1, "d": 1]
+
+ window size = (2 - 0 + 1) = 3 > 2
+
+ → shrink window from left:
+
+    remove chars2[left] = "e"
+    s2Map = ["i": 1, "d": 1]
+
+    left = 1
+
+ window size now = (2 - 1 + 1) = 2
+
+ → compare s2Map with s1Map
+ → ["i","d"] ≠ ["a","b"]
+
+ ------------------------------------------------------------
+ right = 3
+
+ s2Map = ["i": 1, "d": 1, "b": 1]
+
+ window size = (3 - 1 + 1) = 3 > 2
+
+ → shrink window from left:
+
+    remove chars2[left] = "i"
+    s2Map = ["d": 1, "b": 1]
+
+    left = 2
+
+ window size now = (3 - 2 + 1) = 2
+
+ → compare s2Map with s1Map
+ → ["d","b"] ≠ ["a","b"]
+
+ ------------------------------------------------------------
+ right = 4
+
+ s2Map = ["d": 1, "b": 1, "a": 1]
+
+ window size = (4 - 2 + 1) = 3 > 2
+
+ → shrink window from left:
+
+    remove chars2[left] = "d"
+    s2Map = ["b": 1, "a": 1]
+
+    left = 3
+
+ window size now = (4 - 3 + 1) = 2
+
+ → compare s2Map with s1Map
+ → ["b","a"] == ["a","b"]
+
+ → match found → return true
+
+ ------------------------------------------------------------
+
+ Final Result: true
 */
