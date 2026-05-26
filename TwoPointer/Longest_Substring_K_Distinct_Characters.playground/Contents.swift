@@ -395,12 +395,63 @@ twoPointerSW("eceba",2)
 /*
 
  Invariant:
+    - The current window [left, right] always contains at most k distinct characters
+    - The frequency map reflects characters inside this window
+
+ ------------------------------------------------------------
+
  Key Insight:
+
+ This is a dynamic sliding window (two pointer) problem.
+
+ - Convert string into Array<Character> for easier indexing
+ - Use a frequency map to track characters in current window
+ - Use two pointers:
+        left  → shrinks window
+        right → expands window
+
+ ------------------------------------------------------------
+
+ Algorithm:
+
+ Traverse using right pointer:
+
+    - Add chars[right] to frequency map
+
+    - While freq.count > k:
+        - decrement chars[left] frequency
+        - remove it if frequency becomes 0
+        - move left pointer forward
+
+    - Update longest substring length:
+        max(longest, right - left + 1)
+
 */
 
 func optimized(_ s: String, _ k: Int) -> Int {
     
-    return 0
+    var chars = Array(s)
+    var longest: Int = 0
+    
+    var freq:[Character: Int] = [:]
+    var left = 0
+    
+    for right in 0..<chars.count {
+        freq[chars[right], default:0] += 1
+        while freq.count > k {
+            freq[chars[left]]! -= 1
+            if freq[chars[left]] == 0 {
+                freq.removeValue(forKey:chars[left])
+            }
+            
+            left += 1
+        }
+        
+        longest = max(longest, right - left + 1)
+        
+    }
+    
+    return longest
 }
 
 optimized("eceba",2)
@@ -408,5 +459,100 @@ optimized("eceba",2)
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+
+ Input: s = "eceba", k = 2
+ Output: 3
+
+ ------------------------------------------------------------
+
+ Initial:
+
+ chars = ["e", "c", "e", "b", "a"]
+ freq = [:]
+ left = 0
+ longest = 0
+
+ ------------------------------------------------------------
+ right = 0
+
+ chars[right] = "e"
+ freq = ["e":1]
+
+ freq.count = 1 <= 2 → valid
+
+ longest = 1
+
+ window = "e"
+
+ ------------------------------------------------------------
+ right = 1
+
+ chars[right] = "c"
+ freq = ["e":1, "c":1]
+
+ freq.count = 2 <= 2 → valid
+
+ longest = 2
+
+ window = "ec"
+
+ ------------------------------------------------------------
+ right = 2
+
+ chars[right] = "e"
+ freq = ["e":2, "c":1]
+
+ freq.count = 2 <= 2 → valid
+
+ longest = 3
+
+ window = "ece"
+
+ ------------------------------------------------------------
+ right = 3
+
+ chars[right] = "b"
+ freq = ["e":2, "c":1, "b":1]
+
+ freq.count = 3 > 2 → INVALID
+
+ shrink left:
+
+ remove "e" → freq = ["e":1, "c":1, "b":1]
+ left = 1
+
+ still invalid (3 > 2)
+
+ remove "c" → freq = ["e":1, "b":1]
+ left = 2
+
+ now valid
+
+ longest = max(3, 2) = 3
+
+ window = "eb"
+
+ ------------------------------------------------------------
+ right = 4
+
+ chars[right] = "a"
+ freq = ["e":1, "b":1, "a":1]
+
+ freq.count = 3 > 2 → INVALID
+
+ shrink left:
+
+ remove "e" → ["b":1, "a":1]
+ left = 3
+
+ now valid
+
+ longest = 3
+
+ window = "ba"
+
+ ------------------------------------------------------------
+
+ Final Answer = 3
 
 */
