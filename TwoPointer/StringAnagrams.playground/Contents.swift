@@ -311,13 +311,72 @@ twoPointerSW( "cbaebabacd", "abc")
 
 /*
 
- Invariant:
- Key Insight:
-*/
+ Invariant (What is always true):
+    - lookupS always stores the character frequencies of the current sliding window [left...right].
+ 
+  Key Insight(Why the solution works):
+
+  - An anagram contains the exact same character frequencies
+    as string p, regardless of order.
+
+  - Therefore, if we examine every substring of length p.count,
+    any window whose character frequencies match p's frequencies
+    must be an anagram.
+
+  - Since all candidate substrings have the same fixed length,
+    a sliding window allows us to efficiently move through the
+    string without rebuilding frequencies from scratch.
+
+  - As the window expands:
+      - Add the new character entering from the right.
+      - Remove the character leaving from the left.
+
+  - At any moment:
+      lookupS represents the frequencies of the current window.
+      lookupP represents the frequencies required for an anagram.
+
+  - Whenever the window size equals p.count:
+      - Compare lookupS and lookupP.
+      - If they match, the current window is an anagram,
+        so record its starting index.
+ */
+
 
 func optimized(_ s: String, _ p: String) -> [Int] {
     
-    return []
+    var chars = Array(s)
+    var result:[Int] = []
+
+    let lookupP = p.reduce(into:[:]) { count, letter in
+        count[letter, default: 0] += 1
+    }
+    
+    let windowSize = p.count
+    
+    var lookupS: [Character: Int] = [:]
+    var left = 0
+    
+    for right in 0..<chars.count {
+        lookupS[chars[right], default: 0] += 1
+        
+        while (right - left + 1) > windowSize {
+            lookupS[chars[left]]! -= 1
+            if lookupS[chars[left]] == 0 {
+                lookupS.removeValue(forKey:chars[left])
+            }
+            left += 1
+        }
+        
+        if (right - left + 1) == windowSize {
+            if lookupS == lookupP {
+                result.append(left)
+            }
+        }
+        
+    }
+    
+    
+    return result
 }
 
 optimized( "cbaebabacd", "abc")
@@ -325,5 +384,192 @@ optimized( "cbaebabacd", "abc")
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+  Example:
 
-*/
+  Input:  s = "cbaebabacd", p = "abc"
+
+  lookupP = ["a":1, "b":1, "c":1]
+ 
+  windowSize = 3
+
+  --------------------------------------------------
+
+  Initial:
+
+  left = 0
+  lookupS = [:]
+
+  --------------------------------------------------
+
+  right = 0 ('c')
+
+  lookupS = ["c":1]
+
+  Window = "c"
+  Size = 1
+
+  --------------------------------------------------
+
+  right = 1 ('b')
+
+  lookupS = ["c":1, "b":1]
+
+  Window = "cb"
+  Size = 2
+
+  --------------------------------------------------
+
+  right = 2 ('a')
+
+  lookupS = ["c":1, "b":1, "a":1]
+
+  Window = "cba"
+  Size = 3
+
+  lookupS == lookupP
+
+  result = [0]
+
+  --------------------------------------------------
+
+  right = 3 ('e')
+
+  lookupS = ["c":1, "b":1, "a":1, "e":1]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'c'
+
+  lookupS = ["b":1, "a":1, "e":1]
+
+  left = 1
+
+  Window = "bae"
+
+  lookupS != lookupP
+
+  --------------------------------------------------
+
+  right = 4 ('b')
+
+  lookupS = ["b":2, "a":1, "e":1]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'b'
+
+  lookupS = ["b":1, "a":1, "e":1]
+
+  left = 2
+
+  Window = "aeb"
+
+  lookupS != lookupP
+
+  --------------------------------------------------
+
+  right = 5 ('a')
+
+  lookupS = ["b":1, "a":2, "e":1]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'a'
+
+  lookupS = ["b":1, "a":1, "e":1]
+
+  left = 3
+
+  Window = "eba"
+
+  lookupS != lookupP
+
+  --------------------------------------------------
+
+  right = 6 ('b')
+
+  lookupS = ["b":2, "a":1, "e":1]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'e'
+
+  lookupS = ["b":2, "a":1]
+
+  left = 4
+
+  Window = "bab"
+
+  lookupS != lookupP
+
+  --------------------------------------------------
+
+  right = 7 ('a')
+
+  lookupS = ["b":2, "a":2]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'b'
+
+  lookupS = ["b":1, "a":2]
+
+  left = 5
+
+  Window = "aba"
+
+  lookupS != lookupP
+
+  --------------------------------------------------
+
+  right = 8 ('c')
+
+  lookupS = ["b":1, "a":2, "c":1]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'a'
+
+  lookupS = ["b":1, "a":1, "c":1]
+
+  left = 6
+
+  Window = "bac"
+
+  lookupS == lookupP
+
+  result = [0, 6]
+
+  --------------------------------------------------
+
+  right = 9 ('d')
+
+  lookupS = ["b":1, "a":1, "c":1, "d":1]
+
+  Window Size = 4 > 3
+
+  Shrink:
+  remove chars[left] = 'b'
+
+  lookupS = ["a":1, "c":1, "d":1]
+
+  left = 7
+
+  Window = "acd"
+
+  lookupS != lookupP
+
+  --------------------------------------------------
+
+  Finished
+
+  result = [0, 6]
+ */
+ 
+ 
