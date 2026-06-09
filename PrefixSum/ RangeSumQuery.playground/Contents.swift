@@ -259,12 +259,48 @@ prefixSum([2, 4, 6, 8], (1,3))
 /*
 
  Invariant:
+ - prefix[i] stores the sum of all elements from index 0 to i.
+
  Key Insight:
+ - Build a prefix sum array.
+ - Deconstruct the query into (left, right).
+ - Use the prefix sum array to answer the query in O(1).
+
+     - If left == 0:
+       return prefix[right]
+
+     - Otherwise:
+       return prefix[right] - prefix[left - 1]
+
+        This removes the sum of all elements before the desired range, leaving only the sum from left...right.
 */
+
+
+func buildPrefixSum(_ nums: [Int]) -> [Int] {
+    var prefix = Array(repeating: 0, count: nums.count)
+    
+    prefix[0] = nums[0]
+    
+    for i in 1..<nums.count {
+        prefix[i] = prefix[i - 1] + nums[i]
+    }
+    
+    return prefix
+}
+
 
 func optimized(_ nums: [Int], _ queries: (Int, Int)) -> Int {
     
-    return 0
+    let (left, right) = queries
+    
+    let prefix = buildPrefixSum(nums)
+    
+    if left == 0 {
+        return prefix[right]
+    } else {
+        return prefix[right] -  prefix[left - 1]
+    }
+    
 }
 
 optimized([2, 4, 6, 8], (1,3))
@@ -273,4 +309,64 @@ optimized([2, 4, 6, 8], (1,3))
  Phase 7 Validation Trace
  --------------------------------------------------
 
-*/
+ Example:
+ Input: nums = [2, 4, 6, 8], query = (1, 3)
+
+ ---
+
+ Initial:
+
+ left = 1
+ right = 3
+
+ prefix = [2, 6, 12, 20]
+
+ ---
+
+ left != 0
+
+ prefix[right]
+ = prefix[3]
+ = 20
+
+ prefix[left - 1]
+ = prefix[0]
+ = 2
+
+ result
+ = 20 - 2
+ = 18
+
+ return 18
+
+ ---
+
+ Explanation:
+
+ 1. Build a cumulative sum table.
+
+ 2. prefix[i] stores the sum of all elements from index 0 through i.
+
+ 3. prefix[right] contains the sum from index 0 through right.
+
+ 4. This includes extra values that appear before the range we actually want.
+
+ 5. prefix[left - 1] represents the sum of all elements before the desired range.
+
+ 6. By subtracting prefix[left - 1] from prefix[right], we remove the unwanted portion of the sum.
+
+ 7. What remains is only the sum of elements within the range [left...right].
+
+ Result:
+
+ prefix[right] - prefix[left - 1]
+ = 20 - 2
+ = 18
+
+ Range [1...3]
+ = 4 + 6 + 8
+ = 18
+ 
+ */
+
+
