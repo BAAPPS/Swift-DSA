@@ -291,21 +291,221 @@ The lookup table allows us to quickly determine whether a previous prefix sum ex
 */
 // MARK: - Phase 7: Re-Code (After Break)
 
+
 /*
 
- Invariant:
- Key Insight:
+Invariant:
+
+* runningSum contains the prefix sum up to the current index.
+* lookup stores the frequency of every prefix sum seen so far.
+* totalCount stores the number of valid subarrays whose sum equals k.
+
+---
+
+Key Insight:
+
+* Create:
+  * runningSum to track the current prefix sum.
+  * lookup table to store prefixSum -> frequency.
+  * totalCount to count valid subarrays.
+
+* Initialize:
+  * lookup = [0:1]
+  * This represents an empty prefix sum occurring once before the array begins.
+
+---
+
+Algorithm:
+
+Traverse the array:
+
+1. Update the running prefix sum.
+    runningSum += nums[i]
+ 
+2. Calculate the prefix sum needed to form a subarray sum of k.
+    prefixNeeded = runningSum - k
+
+3. Check whether prefixNeeded has been seen before.
+    lookup[prefixNeeded]
+
+4. If found:
+   * A valid subarray exists.
+   * Add the frequency to totalCount.
+
+5. Store the current runningSum in the lookup table.
+    lookup[runningSum, default: 0] += 1
+---
+
+Why It Works:
+
+A subarray sum can be represented as:
+    currentPrefix - previousPrefix = k
+
+Rearranging:
+    previousPrefix = currentPrefix - k
+
+Therefore, if a previous prefix sum equal to (currentPrefix - k) exists, a valid subarray ending at the current index has been found.
+
+---
+
+Edge Case Insight:
+
+When storing frequencies:
+    lookup[0] = 1
+
+    Meaning:
+        * We have seen a prefix sum of 0 exactly once.
+        * This allows subarrays that start at index 0 to be counted.
+
+For problems storing indices instead:
+    lookup[0] = -1
+
+    Meaning:
+        * Prefix sum 0 occurs before the array begins.
+
 */
+
 
 func optimized(_ nums: [Int], _ k: Int) -> Int {
     
-    return 0
+    var runningSum: Int = 0
+    var lookup:[Int: Int] = [0:1]
+    var totalCount: Int = 0
+    
+    for i in 0..<nums.count {
+        runningSum += nums[i]
+        
+        let prefixNeeded = runningSum - k
+        
+        if let count = lookup[prefixNeeded] {
+            totalCount += count
+        }
+        
+        lookup[runningSum, default: 0] += 1
+    }
+    
+    return totalCount
 }
 
-optimized([1,2,3], 2)
+optimized([1,2,3], 3)
 
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ 
+ Example:
+ Input:
+    nums = [1,2,3], k = 3
+ 
+ Output: 2
+ 
+ Valid Subarrays:  [1,2], [3]
+ 
+
+ ---
+
+ Initial State
+
+ runningSum = 0
+
+ lookup = [0:1]
+
+ totalCount = 0
+
+ ---
+
+ i = 0
+
+ nums[0] = 1
+
+ Update runningSum:
+    runningSum = 1
+ 
+ Calculate prefixNeeded:
+    prefixNeeded = 1 - 3
+    prefixNeeded = -2
+
+ Check lookup:
+    lookup[-2] -> nil
+ 
+ No valid subarray found.
+
+ Store current prefix sum:
+    lookup[1, default: 0] += 1
+    lookup: [0:1, 1:1]
+
+ totalCount:  0
+
+ ---
+
+ i = 1
+
+ nums[1] = 2
+
+ Update runningSum:
+    runningSum = 3
+
+ Calculate prefixNeeded:
+    prefixNeeded = 3 - 3
+    prefixNeeded = 0
+ 
+
+ Check lookup:
+    lookup[0] = 1
+
+ Valid subarray found.
+
+ totalCount += 1
+
+ totalCount: 1
+ 
+ Subarray: [1,2]
+ 
+
+ Store current prefix sum:
+     lookup[3, default: 0] += 1
+     lookup: [0:1, 1:1, 3:1]
+     
+ ---
+
+ i = 2
+
+ nums[2] = 3
+
+ Update runningSum:
+    runningSum = 6
+
+ Calculate prefixNeeded:
+     prefixNeeded = 6 - 3
+     prefixNeeded = 3
+
+
+ Check lookup:
+    lookup[3] = 1
+ 
+
+ Valid subarray found.
+
+ totalCount += 1
+
+ totalCount: 2
+ 
+
+ Subarray: [3]
+ 
+
+ Store current prefix sum:
+     lookup[6, default: 0] += 1
+     lookup: [0:1, 1:1, 3:1, 6:1]
+     
+ ---
+
+ Finished
+
+ totalCount = 2
+
+ Return: 2
+ 
+
 
 */
