@@ -281,18 +281,186 @@ produce longer valid subarrays in future matches.
 /*
 
  Invariant:
+     At each index i:
+
+     - runningSum stores the prefix sum of nums[0...i]
+     - lookup stores the earliest index where each prefix sum was first seen
+
+     This allows us to quickly determine whether a previous prefix sum exists that would form a subarray sum of k.
+ 
  Key Insight:
+
+     Instead of recomputing every subarray sum, we use prefix sums.
+
+     For any subarray:
+
+         currentPrefix - previousPrefix = k
+
+     Rearranging gives:
+
+         previousPrefix = currentPrefix - k
+
+     This tells us exactly which prefix sum we need to have seen before.
+
+     Therefore, at each index:
+
+         neededSum = runningSum - k
+
+     If neededSum exists in the lookup table:
+
+         → the subarray between those two indices sums to k
+         → update the longest length found so far
+
+     Otherwise:
+
+         → continue storing unseen prefix sums
+
+     We only store the first occurrence of each prefix sum because earlier indices produce longer subarrays in future matches.
 */
 
 func optimized(_ nums: [Int], _ k: Int) -> Int {
+    var longest: Int = 0
+    var runningSum: Int = 0
     
-    return 0
+    var lookup: [Int:Int] = [0:-1]
+    
+    for i in 0..<nums.count {
+        runningSum += nums[i]
+        
+        let neededSum = runningSum - k
+        
+        if let prevIndex = lookup[neededSum] {
+            longest = max(longest, i - prevIndex)
+        }
+        
+        if lookup[runningSum] == nil {
+            lookup[runningSum] = i
+        }
+    }
+    
+    return longest
 }
 
 optimized( [1,-1,5,-2,3], 3)
 
 /*
- Phase 7 Validation Trace
- --------------------------------------------------
+Phase 7 Validation Trace
+--------------------------------------------------
 
+Example:
+Input: nums = [-2,-1,2,1], k = 1
+Output: 2
+
+Invariant:
+- runningSum stores the prefix sum from nums[0...i]
+- lookup stores the earliest index where each prefix sum was first seen
+
+--------------------------------------------------
+
+Initial:
+
+longest = 0
+runningSum = 0
+lookup = [0:-1]
+
+--------------------------------------------------
+
+i = 0
+
+nums[0] = -2
+
+runningSum = 0 + (-2)
+           = -2
+
+neededSum = -2 - 1
+          = -3
+
+lookup[-3] == nil
+
+Store current prefix sum:
+
+lookup[-2] = 0
+
+lookup = [0:-1, -2:0]
+
+--------------------------------------------------
+
+i = 1
+
+nums[1] = -1
+
+runningSum = -2 + (-1)
+           = -3
+
+neededSum = -3 - 1
+          = -4
+
+lookup[-4] == nil
+
+Store current prefix sum:
+
+lookup[-3] = 1
+
+lookup = [0:-1, -2:0, -3:1]
+
+--------------------------------------------------
+
+i = 2
+
+nums[2] = 2
+
+runningSum = -3 + 2
+           = -1
+
+neededSum = -1 - 1
+          = -2
+
+lookup[-2] = 0
+
+Valid subarray found:
+
+currentLength = 2 - 0
+              = 2
+
+longest = max(0, 2)
+        = 2
+
+Store current prefix sum:
+
+lookup[-1] = 2
+
+lookup = [0:-1, -2:0, -3:1, -1:2]
+
+--------------------------------------------------
+
+i = 3
+
+nums[3] = 1
+
+runningSum = -1 + 1
+           = 0
+
+neededSum = 0 - 1
+          = -1
+
+lookup[-1] = 2
+
+Valid subarray found:
+
+currentLength = 3 - 2
+              = 1
+
+longest = max(2, 1)
+        = 2
+
+Prefix sum 0 already exists at index -1
+
+Do not overwrite:
+lookup[0] remains -1
+
+--------------------------------------------------
+
+Return:
+
+longest = 2
 */
