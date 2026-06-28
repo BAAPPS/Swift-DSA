@@ -292,14 +292,70 @@ Edge case:
 /*
 
  Invariant:
+
+     At each index i:
+
+     - runningSum stores the transformed prefix sum (balance) after mapping:
+         0 → -1
+         1 → +1
+
+     - lookup stores the earliest index where each transformed prefix sum was first seen.
+
+     If the current runningSum has been seen before, the subarray between those two indices has a transformed sum of 0, meaning it contains an equal number of 0s and 1s.
+ 
  Key Insight:
+
+ Instead of recounting 0s and 1s for every subarray,
+ we maintain a transformed running prefix sum.
+
+ For each element:
+
+     if nums[i] == 0:
+         runningSum -= 1
+
+     else:
+         runningSum += 1
+
+ If the current runningSum has been seen before:
+
+     → the subarray between the previous index and current index
+       contains an equal number of 0s and 1s.
+
+     → Update longest.
+
+ Otherwise:
+     → Store the first occurrence of the current runningSum.
+ 
+ We only store the earliest occurrence because it produces
+ the longest possible subarray for future matches.
 */
 
 func optimized(_ nums: [Int]) -> Int {
+    var longest: Int  = 0
+    var lookup:[Int:Int] = [0:-1]
+    var runningSum = 0
     
+    for i in 0..<nums.count {
+        
+        if nums[i] == 0 {
+            runningSum -= 1
+        } else {
+            runningSum += 1
+        }
+        
+        if let prevIndex = lookup[runningSum] {
+            longest = max(longest, i - prevIndex)
+        }
+        
+        
+        if lookup[runningSum] == nil {
+            lookup[runningSum] = i
+        }
+        
+    }
 
 
-    return 0
+    return longest
 }
 
 optimized([0,1])
@@ -307,5 +363,76 @@ optimized([0,1])
 /*
  Phase 7 Validation Trace
  --------------------------------------------------
+ 
+ Example:
+ Input: nums = [0,1,0]
+ Output: 2
 
+ --------------------------------------------------
+
+ Initial:
+
+ runningSum = 0
+ longest = 0
+ lookup = [0:-1]
+
+ --------------------------------------------------
+
+ i = 0
+
+ nums[0] = 0
+
+ Transform:
+ 0 → -1
+
+ runningSum = 0 - 1 = -1
+
+ lookup[-1] not found
+ → store earliest occurrence
+
+ lookup = [0:-1, -1:0]
+
+ --------------------------------------------------
+
+ i = 1
+
+ nums[1] = 1
+
+ Transform:
+ 1 → +1
+
+ runningSum = -1 + 1 = 0
+
+ lookup[0] = -1
+
+ longest = max(0, 1 - (-1))
+          = 2
+
+ lookup[0] already exists
+ → keep earliest index (-1)
+
+ --------------------------------------------------
+
+ i = 2
+
+ nums[2] = 0
+
+ Transform:
+ 0 → -1
+
+ runningSum = 0 - 1 = -1
+
+ lookup[-1] = 0
+
+ longest = max(2, 2 - 0)
+          = 2
+
+ lookup[-1] already exists
+ → keep earliest index (0)
+
+ --------------------------------------------------
+
+ Return:
+
+ longest = 2
 */
