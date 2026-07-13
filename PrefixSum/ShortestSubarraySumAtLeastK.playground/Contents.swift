@@ -357,14 +357,65 @@ In the worst case, all prefix states may remain in the deque.
 // MARK: - Phase 7: Re-Code (After Break)
 
 /*
+Invariant:
 
- Invariant:
- Key Insight:
+At each prefix state:
+
+- prefix stores the running prefix sum up to the current index.
+- deque stores candidate prefix states (index, prefixSum).
+- The deque is maintained in increasing order of prefix sums.
+- Every prefix state remaining in the deque is still capable of producing the shortest valid subarray for some future prefix.
+
+Key Insight:
+
+Represent every subarray using prefix sums:
+
+    subarraySum = currentPrefix - previousPrefix
+
+A valid subarray must satisfy:
+
+    currentPrefix - previousPrefix >= K
+
+Instead of remembering every previous prefix sum, we only keep useful prefix states.
+
+- Remove from the front when the current prefix forms a valid subarray.
+  This updates the shortest length, and that prefix state can never produce a shorter answer again.
+
+- Remove from the back when a newer prefix sum is smaller than or equal to the previous one.
+  The newer prefix state dominates the older one because it can produce the same or larger subarray sums while yielding shorter lengths.
+
+This guarantees the deque always contains the best candidate prefix states for future iterations.
 */
 
+struct prefixStateOptimized {
+    let index: Int
+    let sum: Int
+}
+
 func optimized(_ nums: [Int], _ k: Int) -> Int {
+    var deque: [prefixStateOptimized] = []
+    var shortest: Int = Int.max
+    var prefix: Int = 0
     
-    return 0
+    deque.append(prefixStateOptimized(index: 0, sum: 0))
+    
+    for i in 1...nums.count {
+        prefix += nums[i - 1]
+        
+        while let first = deque.first, prefix - first.sum >= k {
+            shortest = min(shortest, i - first.index)
+            deque.removeFirst()
+        }
+        
+        while let last = deque.last, last.sum >= prefix {
+            deque.removeLast()
+        }
+        
+        deque.append(prefixStateOptimized(index: i, sum: prefix))
+    }
+    
+    
+    return shortest == Int.max ? -1 : shortest
 }
 
 optimized( [2,-1,2], 3)
@@ -372,6 +423,151 @@ optimized( [2,-1,2], 3)
 
 /*
  Phase 7 Validation Trace
- --------------------------------------------------
+ -------------------------------------------------
+ 
+ Example 1:
 
+ Input:
+ nums = [2,-1,2]
+ k = 3
+
+ Output:
+ 3
+
+ Explanation:
+ [2,-1,2] has sum = 3
+
+ ---
+
+ Initial:
+
+ prefix = 0
+ shortest = Int.max
+
+ deque = [(index: 0, sum: 0)]
+
+ ---
+
+ i = 1
+ nums[0] = 2
+
+ prefix = 0 + 2 = 2
+
+ Front Check:
+
+ 2 - 0 = 2
+
+ 2 < 3
+
+ No valid subarray.
+
+ ---
+
+ Back Check:
+
+ last.sum = 0
+
+ 0 >= 2 ?
+
+ No.
+
+ Append current prefix state.
+
+ deque = [(0,0),(1,2) ]
+
+ ---
+
+ i = 2
+ nums[1] = -1
+
+ prefix = 2 + (-1) = 1
+
+ Front Check:
+
+ 1 - 0 = 1
+
+ 1 < 3
+
+ No valid subarray.
+
+ ---
+
+ Back Check:
+
+ last.sum = 2
+
+ 2 >= 1
+
+ Yes.
+
+ Remove (1,2)
+
+ deque = [(0,0)]
+
+ Check again:
+
+ last.sum = 0
+
+ 0 >= 1 ?
+
+ No.
+
+ Append current prefix state.
+
+ deque = [(0,0), (2,1)]
+
+ ---
+
+ i = 3
+ nums[2] = 2
+
+ prefix = 1 + 2 = 3
+
+ Front Check:
+
+ 3 - 0 = 3
+
+ 3 >= 3
+
+ Valid subarray.
+
+ length = 3 - 0 = 3
+
+ shortest = min(Int.max, 3)
+
+ shortest = 3
+
+ Remove front.
+
+ deque = [(2,1)]
+
+ Check front again:
+
+ 3 - 1 = 2
+
+ 2 < 3
+
+ Stop.
+
+ ---
+
+ Back Check:
+
+ last.sum = 1
+
+ 1 >= 3 ?
+
+ No.
+
+ Append current prefix state.
+
+ deque = [(2,1), (3,3)]
+
+ ---
+
+ Final:
+
+ shortest = 3
+
+ Return 3
 */
